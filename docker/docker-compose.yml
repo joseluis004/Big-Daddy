@@ -1,11 +1,11 @@
-version: '3.8'
-
 services:
   finplus_analytics:
-    # Usar el Dockerfile que acabamos de crear en la misma carpeta
+    # IMPORTANTE: Cambiamos el contexto a '..' (la carpeta superior/raíz)
+    # Esto permite a Docker encontrar 'requirements.txt' y la carpeta 'docker/'
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      # Como el contexto ahora es la raíz, especificamos la ruta al Dockerfile
+      dockerfile: docker/Dockerfile
 
     # Sincroniza las carpetas de su PC con el contenedor
     volumes:
