@@ -1,20 +1,15 @@
+version: '3.8'
+
 services:
-  finplus_analytics:
-    # IMPORTANTE: Cambiamos el contexto a '..' (la carpeta superior/raíz)
-    # Esto permite a Docker encontrar 'requirements.txt' y la carpeta 'docker/'
-    build:
-      context: ..
-      # Como el contexto ahora es la raíz, especificamos la ruta al Dockerfile
-      dockerfile: docker/Dockerfile
-
-    # Sincroniza las carpetas de su PC con el contenedor
-    volumes:
-      - ../:/app
-
-    # Publica el puerto 8888 para acceder a JupyterLab desde su navegador
-    ports:
-      - "8888:8888"
-
+  analytics:
+    # Asegúrese de que el nombre del build apunte a su Dockerfile
+    build: . 
     container_name: finplus_analytics_container
-
-    tty: true
+    ports:
+      # Mapeo de puertos CRÍTICO: 8888 del host a 8888 del contenedor
+      - "8888:8888" 
+    volumes:
+      # Mapear su carpeta de trabajo al /app dentro del contenedor
+      - ../:/app 
+    # Comando para anular si es necesario, pero CMD es mejor en el Dockerfile
+    # command: jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root
