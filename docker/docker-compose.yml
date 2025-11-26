@@ -1,14 +1,7 @@
 services:
-  finplus_analytics:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
-
-    volumes:
-      - ../:/workspace   # evita sobrescribir /app
-
+  pyspark:
+    build: ./docker
     ports:
-      - "8888:8888"
-
-    container_name: finplus_analytics_container
-    tty: true
+      - "8888:8888"   # Jupyter
+    volumes:
+      - ./notebooks:/home/jovyan/work
