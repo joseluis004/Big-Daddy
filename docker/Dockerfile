@@ -2,9 +2,10 @@ FROM python:3.10-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Instalar Java (JRE) y dependencias de sistema (necesario para Spark)
+# Instalar Java (JRE) y dependencias de sistema (necesario para Spark).
+# CORRECCIÓN: Usamos 'default-jre' para mayor compatibilidad con Debian Trixie/Slim.
 RUN apt-get update && \
-    apt-get install -y openjdk-17-jre default-libmysqlclient-dev && \
+    apt-get install -y default-jre default-libmysqlclient-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
