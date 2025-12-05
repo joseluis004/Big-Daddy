@@ -1,6 +1,6 @@
 services:
   pyspark:
-    build: ./docker
+    build: .
     ports:
       - "8888:8888"   # Jupyter
     volumes:
