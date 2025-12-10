@@ -8,12 +8,10 @@ import numpy as np
 import plotly.express as px
 from sklearn.decomposition import PCA
 import warnings
-import base64
-from io import StringIO
 
 warnings.filterwarnings("ignore")
 
-# Configuración de la página PRINCIPAL para Cloud
+# Configuración de la página
 st.set_page_config(
     page_title="Risk Analytics Dashboard",
     page_icon="⚠️",
@@ -22,33 +20,42 @@ st.set_page_config(
 )
 
 # ==========================================
-# CSS PERSONALIZADO OPTIMIZADO PARA CLOUD
+# CSS PERSONALIZADO (ACTUALIZADO)
 # ==========================================
 st.markdown("""
 <style>
-    /* Ocultar elementos de Streamlit (Cloud-safe) */
-    [data-testid="stDecoration"] {display: none !important;}
-    [data-testid="stToolbar"] {display: none !important;}
-    [data-testid="stHeader"] {display: none !important;}
-    [data-testid="stAppViewContainer"] {background-color: #0f172a !important;}
+    /* Ocultar elementos de Streamlit */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
     
-    /* Fondo principal - IMPORTANTE para Cloud */
-    .stApp {
-        background: #0f172a !important;
-        padding: 0px !important;
-        margin: 0px !important;
-    }
-    
-    /* Ajustar el contenedor principal */
-    .main .block-container {
-        padding-top: 2rem !important;
+    /* Eliminar márgenes y paddings para fondo completo */
+    .block-container {
+        padding-top: 0rem !important;
         padding-bottom: 0rem !important;
-        padding-left: 2rem !important;
-        padding-right: 2rem !important;
+        padding-left: 0rem !important;
+        padding-right: 0rem !important;
         max-width: 100% !important;
     }
     
-    /* Título principal */
+    /* Fondo del dashboard */
+    .stApp {
+        margin-top: -80px !important;
+        background: #0f172a !important;
+        min-height: 100vh !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    /* Contenedor principal del dashboard */
+    .main-content {
+        background: #0f172a;
+        padding: 0rem 1.5rem;
+        margin: 0 auto;
+        max-width: 100%;
+    }
+    
+    /* Título principal de Riesgo - MÁS GRANDE */
     .risk-title {
         font-size: 32px !important;
         font-weight: 800 !important;
@@ -56,20 +63,20 @@ st.markdown("""
         margin-bottom: 0.5rem !important;
         text-align: center !important;
         letter-spacing: 2px !important;
-        padding-top: 0.5rem !important;
+        padding-top: 1.5rem !important;
     }
     
-    /* Subtítulo de Riesgo */
+    /* Subtítulo de Riesgo - MÁS GRANDE */
     .risk-subtitle {
         color: #94a3b8 !important;
         font-size: 14px !important;
         letter-spacing: 4px !important;
         text-align: center !important;
-        margin-bottom: 2rem !important;
+        margin-bottom: 2.5rem !important;
         text-transform: uppercase !important;
     }
     
-    /* Tarjetas de métricas */
+    /* Tarjetas de métricas - MÁS GRANDES CON MÁRGENES */
     .metric-card-risk {
         background: linear-gradient(135deg, #0b1228 0%, #101f3d 100%) !important;
         border-radius: 16px !important;
@@ -86,7 +93,7 @@ st.markdown("""
         box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5) !important;
     }
     
-    /* Títulos de secciones */
+    /* Títulos de secciones - MÁS GRANDES Y ESPACIADOS */
     .section-title {
         font-size: 22px !important;
         font-weight: 700 !important;
@@ -98,18 +105,14 @@ st.markdown("""
         padding-left: 1rem !important;
     }
     
-    /* Gráficos - HEIGHT FIJADO para evitar cambios en Cloud */
-    [data-testid="stPlotlyChart"] {
+    /* Gráficos más grandes y mejor espaciados */
+    div.stPlotlyChart {
         border-radius: 12px !important;
+        box-shadow: 0 6px 20px 0 rgba(0,0,0,0.3) !important;
         background-color: #0b1228 !important;
         padding: 15px !important;
         margin-bottom: 1.5rem !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        height: 320px !important;
-    }
-    
-    /* Asegurar que los gráficos de Plotly mantengan tamaño */
-    .js-plotly-plot {
         height: 320px !important;
     }
     
@@ -126,15 +129,38 @@ st.markdown("""
         border-radius: 8px !important;
     }
     
-    /* Separadores */
-    .divider {
+    /* Separadores con más espacio */
+    hr {
         margin: 2.5rem 0 !important;
         border: none !important;
         height: 1px !important;
         background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.3), transparent) !important;
     }
     
-    /* Upload box */
+    /* Mejor espaciado en columnas */
+    .stColumn {
+        padding: 0 0.75rem !important;
+    }
+    
+    /* Botones más grandes */
+    .stButton > button {
+        width: 100% !important;
+        height: 48px !important;
+        border-radius: 12px !important;
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        margin-top: 0.5rem !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    /* Tabla con mejor formato */
+    .stDataFrame {
+        border-radius: 12px !important;
+        overflow: hidden !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    /* Upload box más grande y CENTRADO - ESTILO SIMPLIFICADO */
     .upload-box {
         background-color: #1e293b !important;
         border: 2px dashed #00ffff !important;
@@ -150,66 +176,94 @@ st.markdown("""
         justify-content: center !important;
     }
     
-    /* Footer */
+    .upload-box:hover {
+        background-color: #1e293b !important;
+        border-color: #00ffff !important;
+        box-shadow: 0 0 25px rgba(0, 255, 255, 0.3) !important;
+    }
+    
+    /* Título intuitivo para cargar CSV */
+    .upload-title {
+        font-size: 20px !important;
+        font-weight: 600 !important;
+        color: #00ffff !important;
+        text-align: center !important;
+        margin-bottom: 1.5rem !important;
+        padding: 0.5rem !important;
+        letter-spacing: 1px !important;
+    }
+    
+    /* Contenedor del iframe de Three.js */
+    iframe {
+        width: 100vw !important;
+        height: 100vh !important;
+        border: none !important;
+        background: #000000 !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+    }
+    
+    /* TRUCO DEL BOTÓN FANTASMA */
+    .ghost-button-container {
+        display: none !important;
+    }
+    
+    /* Footer mejor espaciado */
     .dashboard-footer {
         text-align: center !important;
-        margin-top: 3rem !important;
+        margin-top: 4rem !important;
         padding: 2rem !important;
         color: #64748b !important;
         font-size: 14px !important;
         border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
     
-    /* Ajustes para tablas en Cloud */
-    [data-testid="stDataFrame"] {
-        border-radius: 12px !important;
-        overflow: hidden !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    }
-    
-    /* Botones */
-    [data-testid="baseButton-secondary"] {
-        background: linear-gradient(135deg, #0b1228 0%, #101f3d 100%) !important;
-        color: #00ffff !important;
-        border: 1px solid #00ffff !important;
-    }
-    
-    /* Contenedor del iframe */
-    iframe {
-        width: 100% !important;
-        height: 100vh !important;
-        border: none !important;
-        background: #000000 !important;
-    }
-    
-    /* Ajustes específicos para Cloud */
-    @media (max-width: 768px) {
-        .main .block-container {
-            padding-left: 1rem !important;
-            padding-right: 1rem !important;
+    /* Ajustes responsive para pantallas grandes */
+    @media (min-width: 1200px) {
+        .main-content {
+            padding: 0rem 3rem !important;
+        }
+        
+        .risk-title {
+            font-size: 36px !important;
         }
         
         .metric-card-risk {
-            padding: 1rem !important;
+            padding: 2rem !important;
         }
         
-        [data-testid="stPlotlyChart"] {
-            height: 280px !important;
+        div.stPlotlyChart {
+            height: 350px !important;
+        }
+    }
+    
+    /* Ajustes para pantallas muy grandes */
+    @media (min-width: 1600px) {
+        .main-content {
+            padding: 0rem 4rem !important;
         }
         
-        .js-plotly-plot {
-            height: 280px !important;
+        .risk-title {
+            font-size: 40px !important;
+        }
+        
+        .section-title {
+            font-size: 26px !important;
+        }
+        
+        div.stPlotlyChart {
+            height: 380px !important;
         }
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ==========================================
-# PORTADA THREE.JS - VERSIÓN CLOUD OPTIMIZADA
+# PORTADA THREE.JS (MODIFICADA - QUITADO EL TEXTO)
 # ==========================================
-def get_threejs_portal():
-    """Genera el HTML del portal Three.js optimizado para Cloud"""
-    return """
+
+threejs_portal = """
 <!DOCTYPE html>
 <html>
 <head>
@@ -222,196 +276,313 @@ def get_threejs_portal():
             box-sizing: border-box;
         }
         
-        body, html {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: #000000;
-        }
-        
-        #three-container {
-            width: 100%;
-            height: 100%;
+        body { 
+            margin: 0; 
+            padding: 0;
+            background-color: #000000 !important; 
+            overflow: hidden; 
+            font-family: sans-serif; 
+            color: white; 
+            width: 100vw;
+            height: 100vh;
             position: fixed;
             top: 0;
             left: 0;
-            background: #000000;
         }
         
-        canvas {
-            display: block;
+        #three-container {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: #000000 !important;
+        }
+        
+        canvas { 
+            display: block; 
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100% !important;
             height: 100% !important;
+            background: #000000 !important;
         }
         
-        .title {
-            position: absolute;
-            top: 30px;
-            font-size: 28px;
-            color: #00ffff;
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
-            letter-spacing: 2px;
-            z-index: 10;
+        .controls { 
+            position: absolute; 
+            bottom: 50px; 
+            z-index: 10; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            width: 100%;
+        }
+        
+        button { 
+            padding: 15px 40px; 
+            cursor: pointer; 
+            background-color: #00ffff; 
+            color: #000000; 
+            border: none; 
+            border-radius: 30px; 
+            font-weight: bold; 
+            font-size: 18px; 
+            letter-spacing: 1px; 
+            transition: all 0.3s ease; 
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5); 
+            margin-top: 20px; 
+        }
+        
+        button:hover { 
+            background-color: #00e6e6; 
+            transform: scale(1.05); 
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.8); 
+        }
+        
+        .title { 
+            position: absolute; 
+            top: 30px; 
+            font-size: 28px; 
+            color: #00ffff; 
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.7); 
+            letter-spacing: 2px; 
+            z-index: 10; 
             width: 100%;
             text-align: center;
-            font-family: 'Arial', sans-serif;
         }
         
-        .controls {
-            position: absolute;
-            bottom: 50px;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-        }
+        /* QUITADO EL SUBTITLE */
         
-        #toggleButton {
-            padding: 15px 40px;
-            cursor: pointer;
-            background-color: #00ffff;
-            color: #000000;
-            border: none;
-            border-radius: 30px;
-            font-weight: bold;
-            font-size: 18px;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-        }
-        
-        #toggleButton:hover {
-            background-color: #00e6e6;
-            transform: scale(1.05);
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
-        }
-        
-        .loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #00ffff;
-            font-size: 18px;
-            z-index: 5;
+        .fullscreen-container {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: #000000 !important;
+            overflow: hidden;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FontLoader.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/math/MeshSurfaceSampler.min.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/FontLoader.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/math/MeshSurfaceSampler.js"></script>
 </head>
 <body>
-    <div id="three-container">
+    <div id="three-container" class="fullscreen-container">
         <div class="title">FIN PLUS PORTAL</div>
-        <div class="loading" id="loadingText">Cargando sistema de partículas...</div>
+        <!-- QUITADO EL TEXTO "Interactive Particle System • Click ENTRAR to Continue" -->
         <div class="controls">
             <button id="toggleButton">ENTRAR</button>
         </div>
     </div>
     
 <script>
-// Script Three.js simplificado y optimizado para Cloud
 let scene, camera, renderer, particles;
-const totalParticles = 8000; // Reducido para mejor performance en Cloud
+const totalParticles = 10000;
 const SPHERE_RADIUS = 4;
 const particleSize = 0.03;
-const ROTATION_SPEED = 0.003;
+const ROTATION_SPEED = 0.004;
+const FONT_URL = 'https://threejs.org/examples/fonts/helvetiker_bold.typeface.json';
+const TEXT = "FinPlus";
 
-function initThreeJS() {
-    // Crear escena
+let sphereTargetPositions = new Float32Array(totalParticles * 3);
+let textTargetPositions = null; 
+let currentPositions;
+let targetPositions = null;
+let isAnimatingToText = false; 
+let isTransitioning = false;
+const transitionSpeed = 0.01; 
+const epsilon = 0.001;
+
+function setupRenderer() {
+    const container = document.getElementById('three-container');
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    
+    renderer.setSize(width, height);
+    renderer.domElement.style.width = '100%';
+    renderer.domElement.style.height = '100%';
+    renderer.domElement.style.position = 'absolute';
+    renderer.domElement.style.top = '0';
+    renderer.domElement.style.left = '0';
+    renderer.domElement.style.background = '#000000';
+}
+
+function triggerStreamlitTransition() {
+    try {
+        const buttons = window.parent.document.getElementsByTagName('button');
+        for (let i = 0; i < buttons.length; i++) {
+            if (buttons[i].innerText === "ENTRAR_AL_DASHBOARD_TRIGGER") {
+                buttons[i].click(); 
+                return;
+            }
+        }
+    } catch (e) { console.error(e); }
+}
+
+function setupScene() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
     
-    // Configurar cámara
     const width = window.innerWidth;
     const height = window.innerHeight;
-    camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-    camera.position.z = 10;
     
-    // Configurar renderer
+    camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
     renderer = new THREE.WebGLRenderer({ 
-        antialias: true,
+        antialias: true, 
         alpha: false,
         powerPreference: "high-performance"
     });
-    renderer.setSize(width, height);
+    
+    setupRenderer();
     document.getElementById('three-container').appendChild(renderer.domElement);
     
-    // Luces
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-    scene.add(ambientLight);
-    
-    const directionalLight = new THREE.DirectionalLight(0x00ffff, 0.8);
-    directionalLight.position.set(5, 5, 5);
-    scene.add(directionalLight);
-    
-    // Crear partículas en esfera
-    createSphereParticles();
-    
-    // Ocultar texto de carga
-    document.getElementById('loadingText').style.display = 'none';
-    
-    // Animación
-    animate();
-    
-    // Configurar botón
-    document.getElementById('toggleButton').addEventListener('click', function() {
-        this.textContent = 'CARGANDO DASHBOARD...';
-        this.disabled = true;
-        
-        // Transición a dashboard
-        setTimeout(function() {
-            window.parent.postMessage('ENTER_DASHBOARD', '*');
-        }, 1000);
-    });
+    camera.position.z = 10;
+    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+    const dl = new THREE.DirectionalLight(0x00ffff, 0.8);
+    dl.position.set(5, 5, 5);
+    scene.add(dl);
 }
 
-function createSphereParticles() {
-    const geometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(totalParticles * 3);
-    const colors = new Float32Array(totalParticles * 3);
-    
+function createParticles() {
     for (let i = 0; i < totalParticles * 3; i += 3) {
         const phi = Math.random() * Math.PI * 2;
         const theta = Math.acos(Math.random() * 2 - 1);
-        
-        positions[i] = SPHERE_RADIUS * Math.sin(theta) * Math.cos(phi);
-        positions[i + 1] = SPHERE_RADIUS * Math.sin(theta) * Math.sin(phi);
-        positions[i + 2] = SPHERE_RADIUS * Math.cos(theta);
-        
-        // Colores cian
-        colors[i] = 0.0;
-        colors[i + 1] = 1.0;
-        colors[i + 2] = 1.0;
+        sphereTargetPositions[i] = SPHERE_RADIUS * Math.sin(theta) * Math.cos(phi);
+        sphereTargetPositions[i + 1] = SPHERE_RADIUS * Math.sin(theta) * Math.sin(phi);
+        sphereTargetPositions[i + 2] = SPHERE_RADIUS * Math.cos(theta);
     }
-    
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(sphereTargetPositions.slice(), 3));
+    currentPositions = geometry.getAttribute('position');
     const material = new THREE.PointsMaterial({ 
-        size: particleSize,
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.8,
-        sizeAttenuation: true
+        size: particleSize, 
+        color: 0x00ffff, 
+        sizeAttenuation: true, 
+        transparent: true, 
+        opacity: 0.9 
     });
-    
     particles = new THREE.Points(geometry, material);
     scene.add(particles);
+}
+
+function createTextPoints() {
+    return new Promise((resolve) => {
+        const loader = new THREE.FontLoader();
+        loader.load(FONT_URL, function (font) {
+            const textGeometry = new THREE.TextGeometry(TEXT, {
+                font: font, 
+                size: 3.0, 
+                height: 0.5, 
+                curveSegments: 24,
+                bevelEnabled: true, 
+                bevelThickness: 0.1, 
+                bevelSize: 0.05, 
+                bevelSegments: 3
+            });
+            textGeometry.computeBoundingBox();
+            const centerOffset_x = -0.5 * (textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x);
+            const centerOffset_y = -0.5 * (textGeometry.boundingBox.max.y - textGeometry.boundingBox.min.y);
+            textGeometry.translate(centerOffset_x, centerOffset_y, 0);
+            textGeometry.scale(1.2, 1.2, 1.2);
+            
+            const mesh = new THREE.Mesh(textGeometry, new THREE.MeshBasicMaterial());
+            const sampler = new THREE.MeshSurfaceSampler(mesh).build();
+            
+            let targetPositions = new Float32Array(totalParticles * 3);
+            const tempPosition = new THREE.Vector3();
+            
+            for (let i = 0; i < totalParticles; i++) {
+                sampler.sample(tempPosition);
+                targetPositions[i * 3] = tempPosition.x + (Math.random() - 0.5) * 0.02;
+                targetPositions[i * 3 + 1] = tempPosition.y + (Math.random() - 0.5) * 0.02;
+                targetPositions[i * 3 + 2] = tempPosition.z + (Math.random() - 0.5) * 0.02;
+            }
+            resolve(targetPositions);
+        });
+    });
 }
 
 function animate() {
     requestAnimationFrame(animate);
     
-    if (particles) {
+    if (targetPositions && currentPositions) {
+        let positionsChanged = false;
+        
+        for (let i = 0; i < totalParticles * 3; i += 3) {
+            const cx = currentPositions.array[i];
+            const cy = currentPositions.array[i + 1];
+            const cz = currentPositions.array[i + 2];
+            const tx = targetPositions[i];
+            const ty = targetPositions[i + 1];
+            const tz = targetPositions[i + 2];
+            
+            currentPositions.array[i] = THREE.MathUtils.lerp(cx, tx, transitionSpeed);
+            currentPositions.array[i + 1] = THREE.MathUtils.lerp(cy, ty, transitionSpeed);
+            currentPositions.array[i + 2] = THREE.MathUtils.lerp(cz, tz, transitionSpeed);
+            
+            if (!positionsChanged) {
+                if (Math.abs(cx - tx) > epsilon || Math.abs(cy - ty) > epsilon || Math.abs(cz - tz) > epsilon) {
+                    positionsChanged = true;
+                }
+            }
+        }
+        currentPositions.needsUpdate = true;
+        
+        if (isTransitioning && !positionsChanged) {
+            isTransitioning = false;
+            if (isAnimatingToText) {
+                particles.rotation.y = 0;
+                setTimeout(triggerStreamlitTransition, 2000);
+            } 
+        }
+    }
+    
+    if (particles && !isAnimatingToText) {
         particles.rotation.y += ROTATION_SPEED;
     }
     
     renderer.render(scene, camera);
 }
 
-// Manejar resize
+async function toggleShape() {
+    if (isTransitioning || isAnimatingToText) return; 
+    isAnimatingToText = true; 
+    isTransitioning = true;
+    
+    if (!textTargetPositions) {
+        textTargetPositions = await createTextPoints();
+    }
+    
+    targetPositions = textTargetPositions;
+    
+    const button = document.getElementById('toggleButton');
+    if (button) {
+        button.textContent = 'TRANSITIONING...';
+        button.style.opacity = '0.7';
+        button.style.cursor = 'wait';
+    }
+    
+    particles.rotation.y = 0;
+}
+
+async function init() {
+    setupScene();
+    createParticles(); 
+    textTargetPositions = await createTextPoints();
+    targetPositions = sphereTargetPositions;
+    
+    const button = document.getElementById('toggleButton');
+    if (button) {
+        button.addEventListener('click', toggleShape);
+    }
+    
+    animate(); 
+}
+
+window.addEventListener('DOMContentLoaded', init);
+
 window.addEventListener('resize', function() {
     const width = window.innerWidth;
     const height = window.innerHeight;
@@ -421,17 +592,8 @@ window.addEventListener('resize', function() {
     renderer.setSize(width, height);
 });
 
-// Inicializar cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(initThreeJS, 100);
-});
-
-// Comunicación con Streamlit
-window.addEventListener('message', function(event) {
-    if (event.data === 'START_ANIMATION') {
-        initThreeJS();
-    }
-});
+document.body.style.backgroundColor = '#000000';
+document.body.style.overflow = 'hidden';
 </script>
 </body>
 </html>
@@ -498,43 +660,53 @@ def process_data_and_predict(df_input: pd.DataFrame):
     return results, scaled_data
 
 # ==========================================
-# DASHBOARD PRINCIPAL - OPTIMIZADO PARA CLOUD
+# FUNCIÓN DEL DASHBOARD (MANTENIDO IGUAL)
 # ==========================================
 
 def create_dashboard():
-    """Dashboard optimizado para Streamlit Cloud"""
+    """Crea el dashboard principal con mejor distribución en pantallas grandes."""
     
-    # Título principal
+    st.markdown('<div class="main-content">', unsafe_allow_html=True)
+    
+    # Título principal - MÁS GRANDE Y MEJOR ESPACIADO
     st.markdown("""
-    <div style="text-align: center; padding: 1rem 0;">
+    <div style="text-align: center; padding: 2rem 0 1rem 0;">
         <div class="risk-title">⚠️ Risk Analytics Platform</div>
         <div class="risk-subtitle">MODELO DE RIESGO CREDITICIO</div>
     </div>
     """, unsafe_allow_html=True)
     
-    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+    # Separador elegante
+    st.markdown('<hr>', unsafe_allow_html=True)
     
-    # --- SECCIÓN DE CARGA DE DATOS ---
+    # --- SECCIÓN DE CARGA DE DATOS - CON NOMBRE INTUITIVO ---
+    
+    # Título intuitivo para cargar CSV
     st.markdown("""
-    <div class="upload-title" style="text-align: center; color: #00ffff; font-size: 20px; margin-bottom: 1rem;">
+    <div class="upload-title">
         📁 CARGAR DATOS DE CLIENTES (CSV)
     </div>
     """, unsafe_allow_html=True)
     
-    # Contenedor para upload
-    col_upload = st.columns([1, 2, 1])
-    with col_upload[1]:
-        uploaded_file = st.file_uploader(
-            "Seleccionar archivo CSV", 
-            type="csv",
-            help="Sube un archivo CSV con datos de clientes",
-            label_visibility="collapsed"
-        )
+    # Contenedor centrado para el upload box
+    st.markdown("""
+    <div style="display: flex; justify-content: center; width: 100%;">
+        <div class="upload-box">
+    """, unsafe_allow_html=True)
+    
+    # File uploader dentro del contenedor centrado - CON NOMBRE MÁS INTUITIVO
+    uploaded_file = st.file_uploader("Seleccionar archivo CSV de datos de clientes", type="csv", 
+                                     help="Sube un archivo CSV con información de clientes para analizar")
+    
+    st.markdown("""
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Inicializar con datos simulados
     results, scaled, df_importance, feature_names = simulate_risk_data()
     
-    # Procesar archivo subido
+    # Procesar archivo subido - MANTENIDO IGUAL
     if uploaded_file is not None:
         try:
             df_uploaded = pd.read_csv(uploaded_file)
@@ -543,7 +715,14 @@ def create_dashboard():
             if not new_results.empty:
                 results = new_results
                 scaled = new_scaled
-                st.success(f"✅ Datos cargados correctamente: **{len(results)}** registros procesados")
+                # Mostrar mensaje de éxito centrado
+                st.markdown("""
+                <div style="display: flex; justify-content: center; margin: 1rem 0;">
+                    <div style="background-color: #10b981; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; text-align: center;">
+                        ✅ Datos cargados correctamente: <strong>{}</strong> registros procesados
+                    </div>
+                </div>
+                """.format(len(results)), unsafe_allow_html=True)
         except Exception as e:
             st.error(f"❌ Error al procesar archivo: {e}")
     
@@ -552,21 +731,21 @@ def create_dashboard():
     total_count = len(results)
     prob_promedio = results['PROBABILIDAD_NON_COMPLIANT'].mean() * 100
     
-    # Configuración Plotly FIJA para evitar cambios en Cloud
+    # Configuración de estilo Plotly optimizada para pantallas grandes
     PLOTLY_LAYOUT = {
         'template': "plotly_dark",
-        'margin': dict(l=10, r=10, t=30, b=10),
-        'height': 300,  # ALTURA FIJA
-        'plot_bgcolor': '#0b1228',
-        'paper_bgcolor': '#0b1228',
+        'margin': dict(l=10, r=10, t=40, b=20),
+        'height': 320,
+        'plot_bgcolor': '#0b1228', 
+        'paper_bgcolor': '#0b1228', 
         'font': {'color': '#ffffff', 'size': 12},
-        'hovermode': 'closest',
-        'autosize': False  # IMPORTANTE: Desactivar autosize
+        'hovermode': 'closest'
     }
     
-    # --- Fila 1: Indicadores Clave ---
+    # --- Fila 1: Indicadores Clave (Métricas) - MÁS ESPACIADAS ---
     st.markdown('<div class="section-title">🔑 Métricas Clave del Modelo</div>', unsafe_allow_html=True)
     
+    # Usar 2 filas de 2 columnas cada una para mejor distribución en pantallas grandes
     col1, col2, col3, col4 = st.columns(4)
     
     def metric_card(col, label, value, color, icon="📊"):
@@ -580,16 +759,19 @@ def create_dashboard():
         </div>
         """, unsafe_allow_html=True)
     
+    # Calcular métricas
     rate = f"{alto_riesgo_count/total_count:.1%}" if total_count > 0 else "0%"
     
+    # Mostrar métricas
     metric_card(col1, "TOTAL CLIENTES", f"{total_count:,}", "#00ffff", "👥")
     metric_card(col2, "TASA ALTO RIESGO", rate, "#ff4b4b", "⚠️")
     metric_card(col3, "ALTO RIESGO", f"{alto_riesgo_count:,}", "#ff4b4b", "🔴")
     metric_card(col4, "PROBABILIDAD MEDIA", f"{prob_promedio:.2f}%", "#fdb400", "📈")
     
-    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+    # Separador
+    st.markdown('<hr>', unsafe_allow_html=True)
     
-    # --- Fila 2: Visualizaciones con ALTURAS FIJAS ---
+    # --- Fila 2: Visualizaciones - MEJOR DISTRIBUIDAS ---
     st.markdown('<div class="section-title">📊 Visualizaciones del Modelo</div>', unsafe_allow_html=True)
     
     # Primera fila de gráficos
@@ -606,16 +788,16 @@ def create_dashboard():
             )
             pie_fig.update_traces(
                 marker=dict(line=dict(color='#0c1a35', width=2)), 
-                textinfo='percent+label'
+                textinfo='percent+label',
+                textposition='outside',
+                pull=[0.1, 0]
             )
             pie_fig.update_layout(
-                **PLOTLY_LAYOUT,
+                PLOTLY_LAYOUT,
                 showlegend=True,
-                legend=dict(orientation="h", yanchor="bottom", y=-0.2)
+                legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="center", x=0.5)
             )
-            # Forzar altura fija
-            pie_fig.update_layout(height=300, autosize=False)
-            st.plotly_chart(pie_fig, use_container_width=True, config={'responsive': False})
+            st.plotly_chart(pie_fig, use_container_width=True)
     
     with col_viz2:
         st.markdown("<h4>📈 Densidad de Probabilidad</h4>", unsafe_allow_html=True)
@@ -641,9 +823,8 @@ def create_dashboard():
                 yaxis_title="Frecuencia",
                 bargap=0.1
             )
-            density_fig.update_layout(**PLOTLY_LAYOUT)
-            density_fig.update_layout(height=300, autosize=False)
-            st.plotly_chart(density_fig, use_container_width=True, config={'responsive': False})
+            density_fig.update_layout(PLOTLY_LAYOUT)
+            st.plotly_chart(density_fig, use_container_width=True)
     
     # Segunda fila de gráficos
     col_viz3, col_viz4 = st.columns(2)
@@ -668,13 +849,17 @@ def create_dashboard():
                 pca_plot.update_traces(
                     marker=dict(opacity=0.7, line=dict(width=1, color='white'))
                 )
-                pca_plot.update_layout(**PLOTLY_LAYOUT)
-                pca_plot.update_layout(height=300, autosize=False)
-                st.plotly_chart(pca_plot, use_container_width=True, config={'responsive': False})
+                pca_plot.update_layout(
+                    PLOTLY_LAYOUT,
+                    showlegend=True,
+                    xaxis_title="Componente Principal 1",
+                    yaxis_title="Componente Principal 2"
+                )
+                st.plotly_chart(pca_plot, use_container_width=True)
             else:
                 st.info("📊 Datos insuficientes para análisis PCA")
         except Exception as e:
-            st.info("📊 Error en análisis PCA")
+            st.info(f"📊 Error en PCA: {str(e)[:50]}...")
     
     with col_viz4:
         st.markdown("<h4>🏆 Top 5 Variables Importantes</h4>", unsafe_allow_html=True)
@@ -691,15 +876,25 @@ def create_dashboard():
             )
             importance_fig.update_traces(
                 texttemplate='%{text:.1f}%', 
-                textposition='outside'
+                textposition='outside', 
+                marker_line_width=0,
+                opacity=0.9
             )
-            importance_fig.update_layout(**PLOTLY_LAYOUT)
-            importance_fig.update_layout(height=300, autosize=False)
-            st.plotly_chart(importance_fig, use_container_width=True, config={'responsive': False})
+            importance_fig.update_layout(
+                PLOTLY_LAYOUT,
+                xaxis_title="Importancia Relativa (%)",
+                yaxis_title="",
+                xaxis_showgrid=True,
+                yaxis_automargin=True,
+                coloraxis_showscale=False
+            )
+            importance_fig.update_xaxes(range=[0, df_importance['Importance_Norm'].max() * 1.2])
+            st.plotly_chart(importance_fig, use_container_width=True)
     
-    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+    # Separador
+    st.markdown('<hr>', unsafe_allow_html=True)
     
-    # --- Fila 3: Tabla y Exportación ---
+    # --- Fila 3: Tabla y Exportación - MEJOR ORGANIZADO ---
     st.markdown('<div class="section-title">📋 Resultados y Exportación</div>', unsafe_allow_html=True)
     
     col_data, col_export = st.columns([3, 1])
@@ -707,96 +902,100 @@ def create_dashboard():
     with col_data:
         st.markdown("#### 📜 Resultados de Predicción")
         if total_count > 0:
+            # Formatear mejor la tabla
             df_display = results[['CLIENT_ID', 'PROBABILIDAD_NON_COMPLIANT', 'Nivel_Riesgo']].copy()
             df_display['PROBABILIDAD_NON_COMPLIANT'] = df_display['PROBABILIDAD_NON_COMPLIANT'].apply(lambda x: f"{x:.2%}")
             df_display = df_display.rename(columns={
                 'CLIENT_ID': 'ID Cliente',
                 'PROBABILIDAD_NON_COMPLIANT': 'Prob. Incumplimiento',
                 'Nivel_Riesgo': 'Nivel de Riesgo'
-            }).head(15)
+            }).head(15)  # Mostrar más filas en pantallas grandes
             
-            # Mostrar tabla
-            st.dataframe(df_display, use_container_width=True, height=400)
+            # Función para colorear las filas
+            def highlight_rows(row):
+                color = '#ffcccc' if row['Nivel de Riesgo'] == 'ALTO RIESGO' else '#ccffcc'
+                return ['background-color: {}'.format(color)] * len(row)
+            
+            # Mostrar tabla con mejor formato
+            st.dataframe(
+                df_display.style.apply(highlight_rows, axis=1),
+                use_container_width=True,
+                height=400  # Más alto para pantallas grandes
+            )
     
     with col_export:
         st.markdown("#### 📥 Exportar Resultados")
         st.markdown("---")
         
+        # Estadísticas rápidas
         st.metric("Total Registros", f"{total_count:,}")
         st.metric("Alto Riesgo", f"{alto_riesgo_count:,}")
+        st.metric("Tasa", f"{alto_riesgo_count/total_count:.1%}")
         
+        # Botón de descarga
         if total_count > 0:
             csv_data = results.to_csv(index=False).encode('utf-8')
             st.download_button(
-                label="⬇️ Descargar CSV",
+                label="⬇️ Descargar CSV Completo",
                 data=csv_data,
-                file_name="predicciones_riesgo.csv",
+                file_name="predicciones_riesgo_completo.csv",
                 mime="text/csv",
                 use_container_width=True
             )
+            
+            # Botón para reporte resumido
+            if st.button("📄 Generar Reporte PDF", use_container_width=True):
+                st.info("🔄 Funcionalidad de PDF en desarrollo...")
     
-    # Footer
+    # Footer del dashboard
     st.markdown("""
     <div class="dashboard-footer">
         <div style="font-size: 16px; font-weight: 600; margin-bottom: 0.5rem; color: #00ffff;">
             Fin Plus Analytics Platform
         </div>
         <div style="margin-bottom: 1rem;">Modelo predictivo de riesgo crediticio • Versión 2.0</div>
+        <div style="font-size: 12px; color: #94a3b8;">
+            <div>Powered by Three.js Interactive Portal • Streamlit • Plotly</div>
+            <div style="margin-top: 0.5rem;">© 2024 Fin Plus Analytics. Todos los derechos reservados.</div>
+        </div>
     </div>
     """, unsafe_allow_html=True)
     
-    # Botón para regresar
+    # Botón para regresar al portal
     st.markdown("---")
-    if st.button("🔄 Regresar al Portal", type="secondary", use_container_width=True):
-        st.session_state.portal_complete = False
-        st.rerun()
+    col_return = st.columns([1, 2, 1])
+    with col_return[1]:
+        if st.button("🔄 Regresar al Portal Interactivo", type="secondary", use_container_width=True):
+            st.session_state.portal_complete = False
+            st.rerun()
 
 # ==========================================
-# LÓGICA PRINCIPAL - OPTIMIZADA PARA CLOUD
+# LÓGICA PRINCIPAL
 # ==========================================
 
-# Inicializar estado de sesión
 if 'portal_complete' not in st.session_state:
     st.session_state.portal_complete = False
 
-# Manejar mensajes del iframe
-def handle_iframe_message():
-    """Manejar comunicación desde el iframe Three.js"""
-    js_code = """
-    <script>
-    window.addEventListener('message', function(event) {
-        if (event.data === 'ENTER_DASHBOARD') {
-            window.parent.streamlitWindow.setComponentValue('ENTER_DASHBOARD');
-        }
-    });
-    
-    // Iniciar animación cuando el iframe esté listo
-    window.dispatchEvent(new Event('START_ANIMATION'));
-    </script>
-    """
-    return js_code
-
-# Botón oculto para manejar la transición
-if st.button("ENTRAR_AL_DASHBOARD", key="hidden_btn", help="", type="primary", visible=False):
+# Botón fantasma para la transición
+st.markdown('<div class="ghost-button-container">', unsafe_allow_html=True)
+if st.button("ENTRAR_AL_DASHBOARD_TRIGGER", key="btn_trigger_hidden"):
     st.session_state.portal_complete = True
     st.rerun()
+st.markdown('</div>', unsafe_allow_html=True)
 
-# Renderizar portal o dashboard
+# Lógica de renderizado
 if not st.session_state.portal_complete:
     # Mostrar portal Three.js
-    components.html(
-        get_threejs_portal(), 
-        height=700,  # Altura fija
-        scrolling=False
-    )
+    components.html(threejs_portal, height=1000, scrolling=False)
     
-    # Inyectar código JavaScript para comunicación
-    components.html(handle_iframe_message(), height=0)
-    
-    # Verificar si se recibió el mensaje
-    if st.experimental_get_query_params().get('enter', False):
-        st.session_state.portal_complete = True
-        st.rerun()
+    # Mensaje de carga
+    with st.empty().container():
+        st.markdown("""
+        <div style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+                    color: #94a3b8; font-size: 12px; text-align: center; z-index: 10000;">
+            🌀 Cargando portal interactivo...
+        </div>
+        """, unsafe_allow_html=True)
 else:
     # Mostrar dashboard
     create_dashboard()
