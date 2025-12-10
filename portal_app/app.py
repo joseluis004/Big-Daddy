@@ -8,6 +8,7 @@ import numpy as np
 import plotly.express as px
 from sklearn.decomposition import PCA
 import warnings
+import base64
 
 warnings.filterwarnings("ignore")
 
@@ -20,42 +21,40 @@ st.set_page_config(
 )
 
 # ==========================================
-# CSS PERSONALIZADO (ACTUALIZADO)
+# CSS PERSONALIZADO (OPTIMIZADO PARA COMMUNITY CLOUD)
 # ==========================================
 st.markdown("""
 <style>
-    /* Ocultar elementos de Streamlit */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
+    /* Ocultar elementos de Streamlit - VERSIÓN SEGURA */
+    #MainMenu {visibility: hidden !important;}
+    footer {visibility: hidden !important;}
+    header {visibility: hidden !important;}
     
-    /* Eliminar márgenes y paddings para fondo completo */
+    /* IMPORTANTE: Eliminar 'fixed' y 'absolute' problemáticos para Community Cloud */
     .block-container {
-        padding-top: 0rem !important;
-        padding-bottom: 0rem !important;
-        padding-left: 0rem !important;
-        padding-right: 0rem !important;
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+        padding-left: 0px !important;
+        padding-right: 0px !important;
         max-width: 100% !important;
     }
     
-    /* Fondo del dashboard */
+    /* Fondo del dashboard - VERSIÓN SEGURA */
     .stApp {
-        margin-top: -80px !important;
         background: #0f172a !important;
         min-height: 100vh !important;
-        padding: 0 !important;
-        margin: 0 !important;
     }
     
-    /* Contenedor principal del dashboard */
+    /* Contenedor principal - ELIMINADO position: fixed/absolute */
     .main-content {
         background: #0f172a;
         padding: 0rem 1.5rem;
         margin: 0 auto;
         max-width: 100%;
+        position: relative !important; /* Cambiado de fixed a relative */
     }
     
-    /* Título principal de Riesgo - MÁS GRANDE */
+    /* Título principal de Riesgo */
     .risk-title {
         font-size: 32px !important;
         font-weight: 800 !important;
@@ -66,7 +65,7 @@ st.markdown("""
         padding-top: 1.5rem !important;
     }
     
-    /* Subtítulo de Riesgo - MÁS GRANDE */
+    /* Subtítulo de Riesgo */
     .risk-subtitle {
         color: #94a3b8 !important;
         font-size: 14px !important;
@@ -76,7 +75,7 @@ st.markdown("""
         text-transform: uppercase !important;
     }
     
-    /* Tarjetas de métricas - MÁS GRANDES CON MÁRGENES */
+    /* Tarjetas de métricas */
     .metric-card-risk {
         background: linear-gradient(135deg, #0b1228 0%, #101f3d 100%) !important;
         border-radius: 16px !important;
@@ -93,19 +92,18 @@ st.markdown("""
         box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5) !important;
     }
     
-    /* Títulos de secciones - MÁS GRANDES Y ESPACIADOS */
+    /* Títulos de secciones */
     .section-title {
         font-size: 22px !important;
         font-weight: 700 !important;
         color: #ffffff !important;
         margin-top: 2rem !important;
         margin-bottom: 1.5rem !important;
-        padding-left: 0.5rem !important;
-        border-left: 4px solid #00ffff !important;
         padding-left: 1rem !important;
+        border-left: 4px solid #00ffff !important;
     }
     
-    /* Gráficos más grandes y mejor espaciados */
+    /* Gráficos */
     div.stPlotlyChart {
         border-radius: 12px !important;
         box-shadow: 0 6px 20px 0 rgba(0,0,0,0.3) !important;
@@ -129,7 +127,7 @@ st.markdown("""
         border-radius: 8px !important;
     }
     
-    /* Separadores con más espacio */
+    /* Separadores */
     hr {
         margin: 2.5rem 0 !important;
         border: none !important;
@@ -142,7 +140,7 @@ st.markdown("""
         padding: 0 0.75rem !important;
     }
     
-    /* Botones más grandes */
+    /* Botones */
     .stButton > button {
         width: 100% !important;
         height: 48px !important;
@@ -153,14 +151,14 @@ st.markdown("""
         transition: all 0.3s ease !important;
     }
     
-    /* Tabla con mejor formato */
+    /* Tabla */
     .stDataFrame {
         border-radius: 12px !important;
         overflow: hidden !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
     
-    /* Upload box más grande y CENTRADO - ESTILO SIMPLIFICADO */
+    /* Upload box - REVISADO para Community Cloud */
     .upload-box {
         background-color: #1e293b !important;
         border: 2px dashed #00ffff !important;
@@ -170,10 +168,6 @@ st.markdown("""
         margin: 1rem auto 2rem auto !important;
         transition: all 0.3s ease !important;
         max-width: 600px !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
     }
     
     .upload-box:hover {
@@ -193,23 +187,29 @@ st.markdown("""
         letter-spacing: 1px !important;
     }
     
-    /* Contenedor del iframe de Three.js */
-    iframe {
-        width: 100vw !important;
+    /* IMPORTANTE: ELIMINADO el iframe problemático para Community Cloud */
+    /* Se reemplaza por un div normal */
+    .threejs-container {
+        width: 100% !important;
         height: 100vh !important;
         border: none !important;
         background: #000000 !important;
-        position: fixed !important;
+        position: relative !important; /* Cambiado de fixed a relative */
         top: 0 !important;
         left: 0 !important;
     }
     
-    /* TRUCO DEL BOTÓN FANTASMA */
+    /* TRUCO DEL BOTÓN FANTASMA - MEJORADO */
     .ghost-button-container {
-        display: none !important;
+        position: absolute !important;
+        opacity: 0 !important;
+        z-index: -9999 !important;
+        height: 0 !important;
+        width: 0 !important;
+        overflow: hidden !important;
     }
     
-    /* Footer mejor espaciado */
+    /* Footer */
     .dashboard-footer {
         text-align: center !important;
         margin-top: 4rem !important;
@@ -219,7 +219,29 @@ st.markdown("""
         border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
     
-    /* Ajustes responsive para pantallas grandes */
+    /* Botón de portal mejorado */
+    .portal-button {
+        background: linear-gradient(135deg, #00ffff 0%, #0099cc 100%) !important;
+        color: #000000 !important;
+        font-weight: 800 !important;
+        font-size: 18px !important;
+        letter-spacing: 1px !important;
+        padding: 15px 40px !important;
+        border-radius: 30px !important;
+        border: none !important;
+        cursor: pointer !important;
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.5) !important;
+        transition: all 0.3s ease !important;
+        margin: 20px auto !important;
+        display: block !important;
+    }
+    
+    .portal-button:hover {
+        transform: scale(1.05) !important;
+        box-shadow: 0 0 30px rgba(0, 255, 255, 0.8) !important;
+    }
+    
+    /* Ajustes responsive */
     @media (min-width: 1200px) {
         .main-content {
             padding: 0rem 3rem !important;
@@ -238,7 +260,6 @@ st.markdown("""
         }
     }
     
-    /* Ajustes para pantallas muy grandes */
     @media (min-width: 1600px) {
         .main-content {
             padding: 0rem 4rem !important;
@@ -260,10 +281,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# PORTADA THREE.JS (MODIFICADA - QUITADO EL TEXTO)
+# PORTADA THREE.JS SIMPLIFICADA PARA COMMUNITY CLOUD
 # ==========================================
 
-threejs_portal = """
+# En Community Cloud, usamos un HTML más simple sin iframes
+threejs_portal_simple = """
 <!DOCTYPE html>
 <html>
 <head>
@@ -283,20 +305,17 @@ threejs_portal = """
             overflow: hidden; 
             font-family: sans-serif; 
             color: white; 
-            width: 100vw;
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
+            width: 100%;
+            height: 100%;
+            position: relative;
         }
         
         #three-container {
-            width: 100vw;
+            width: 100%;
             height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
+            position: relative;
             background: #000000 !important;
+            overflow: hidden;
         }
         
         canvas { 
@@ -319,27 +338,6 @@ threejs_portal = """
             width: 100%;
         }
         
-        button { 
-            padding: 15px 40px; 
-            cursor: pointer; 
-            background-color: #00ffff; 
-            color: #000000; 
-            border: none; 
-            border-radius: 30px; 
-            font-weight: bold; 
-            font-size: 18px; 
-            letter-spacing: 1px; 
-            transition: all 0.3s ease; 
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5); 
-            margin-top: 20px; 
-        }
-        
-        button:hover { 
-            background-color: #00e6e6; 
-            transform: scale(1.05); 
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.8); 
-        }
-        
         .title { 
             position: absolute; 
             top: 30px; 
@@ -351,253 +349,223 @@ threejs_portal = """
             width: 100%;
             text-align: center;
         }
-        
-        /* QUITADO EL SUBTITLE */
-        
-        .fullscreen-container {
-            width: 100vw;
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background: #000000 !important;
-            overflow: hidden;
-        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/FontLoader.js"></script>
-    <script src="https://unpkg.com/three@0.128.0/examples/js/math/MeshSurfaceSampler.js"></script>
+    <script>
+        // Versión simplificada de Three.js para Community Cloud
+        let scene, camera, renderer, particles;
+        const totalParticles = 5000; // Reducido para mejor performance
+        const SPHERE_RADIUS = 3;
+        const particleSize = 0.02;
+        const ROTATION_SPEED = 0.002;
+        
+        function init() {
+            // Crear escena
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000000);
+            
+            // Configurar cámara
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+            
+            // Configurar renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Optimización
+            
+            // Añadir al DOM
+            document.getElementById('three-container').appendChild(renderer.domElement);
+            
+            // Posicionar cámara
+            camera.position.z = 8;
+            
+            // Crear partículas
+            createParticles();
+            
+            // Añadir luz básica
+            const light = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(light);
+            
+            const directionalLight = new THREE.DirectionalLight(0x00ffff, 0.8);
+            directionalLight.position.set(5, 5, 5);
+            scene.add(directionalLight);
+            
+            // Iniciar animación
+            animate();
+            
+            // Manejar resize
+            window.addEventListener('resize', onWindowResize);
+        }
+        
+        function createParticles() {
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(totalParticles * 3);
+            const colors = new Float32Array(totalParticles * 3);
+            
+            for (let i = 0; i < totalParticles * 3; i += 3) {
+                // Crear partículas en una esfera
+                const phi = Math.random() * Math.PI * 2;
+                const theta = Math.acos(Math.random() * 2 - 1);
+                
+                positions[i] = SPHERE_RADIUS * Math.sin(theta) * Math.cos(phi);
+                positions[i + 1] = SPHERE_RADIUS * Math.sin(theta) * Math.sin(phi);
+                positions[i + 2] = SPHERE_RADIUS * Math.cos(theta);
+                
+                // Colores cian
+                colors[i] = 0.0;     // R
+                colors[i + 1] = 1.0; // G
+                colors[i + 2] = 1.0; // B
+            }
+            
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            
+            const material = new THREE.PointsMaterial({
+                size: particleSize,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                sizeAttenuation: true
+            });
+            
+            particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Rotación suave
+            if (particles) {
+                particles.rotation.y += ROTATION_SPEED;
+                particles.rotation.x += ROTATION_SPEED * 0.5;
+            }
+            
+            renderer.render(scene, camera);
+        }
+        
+        function onWindowResize() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        }
+        
+        // Iniciar cuando el DOM esté listo
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
 </head>
 <body>
-    <div id="three-container" class="fullscreen-container">
+    <div id="three-container" class="threejs-container">
         <div class="title">FIN PLUS PORTAL</div>
-        <!-- QUITADO EL TEXTO "Interactive Particle System • Click ENTRAR to Continue" -->
-        <div class="controls">
-            <button id="toggleButton">ENTRAR</button>
-        </div>
     </div>
-    
-<script>
-let scene, camera, renderer, particles;
-const totalParticles = 10000;
-const SPHERE_RADIUS = 4;
-const particleSize = 0.03;
-const ROTATION_SPEED = 0.004;
-const FONT_URL = 'https://threejs.org/examples/fonts/helvetiker_bold.typeface.json';
-const TEXT = "FinPlus";
-
-let sphereTargetPositions = new Float32Array(totalParticles * 3);
-let textTargetPositions = null; 
-let currentPositions;
-let targetPositions = null;
-let isAnimatingToText = false; 
-let isTransitioning = false;
-const transitionSpeed = 0.01; 
-const epsilon = 0.001;
-
-function setupRenderer() {
-    const container = document.getElementById('three-container');
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    
-    renderer.setSize(width, height);
-    renderer.domElement.style.width = '100%';
-    renderer.domElement.style.height = '100%';
-    renderer.domElement.style.position = 'absolute';
-    renderer.domElement.style.top = '0';
-    renderer.domElement.style.left = '0';
-    renderer.domElement.style.background = '#000000';
-}
-
-function triggerStreamlitTransition() {
-    try {
-        const buttons = window.parent.document.getElementsByTagName('button');
-        for (let i = 0; i < buttons.length; i++) {
-            if (buttons[i].innerText === "ENTRAR_AL_DASHBOARD_TRIGGER") {
-                buttons[i].click(); 
-                return;
-            }
-        }
-    } catch (e) { console.error(e); }
-}
-
-function setupScene() {
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000);
-    
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    
-    camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-    renderer = new THREE.WebGLRenderer({ 
-        antialias: true, 
-        alpha: false,
-        powerPreference: "high-performance"
-    });
-    
-    setupRenderer();
-    document.getElementById('three-container').appendChild(renderer.domElement);
-    
-    camera.position.z = 10;
-    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-    const dl = new THREE.DirectionalLight(0x00ffff, 0.8);
-    dl.position.set(5, 5, 5);
-    scene.add(dl);
-}
-
-function createParticles() {
-    for (let i = 0; i < totalParticles * 3; i += 3) {
-        const phi = Math.random() * Math.PI * 2;
-        const theta = Math.acos(Math.random() * 2 - 1);
-        sphereTargetPositions[i] = SPHERE_RADIUS * Math.sin(theta) * Math.cos(phi);
-        sphereTargetPositions[i + 1] = SPHERE_RADIUS * Math.sin(theta) * Math.sin(phi);
-        sphereTargetPositions[i + 2] = SPHERE_RADIUS * Math.cos(theta);
-    }
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.BufferAttribute(sphereTargetPositions.slice(), 3));
-    currentPositions = geometry.getAttribute('position');
-    const material = new THREE.PointsMaterial({ 
-        size: particleSize, 
-        color: 0x00ffff, 
-        sizeAttenuation: true, 
-        transparent: true, 
-        opacity: 0.9 
-    });
-    particles = new THREE.Points(geometry, material);
-    scene.add(particles);
-}
-
-function createTextPoints() {
-    return new Promise((resolve) => {
-        const loader = new THREE.FontLoader();
-        loader.load(FONT_URL, function (font) {
-            const textGeometry = new THREE.TextGeometry(TEXT, {
-                font: font, 
-                size: 3.0, 
-                height: 0.5, 
-                curveSegments: 24,
-                bevelEnabled: true, 
-                bevelThickness: 0.1, 
-                bevelSize: 0.05, 
-                bevelSegments: 3
-            });
-            textGeometry.computeBoundingBox();
-            const centerOffset_x = -0.5 * (textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x);
-            const centerOffset_y = -0.5 * (textGeometry.boundingBox.max.y - textGeometry.boundingBox.min.y);
-            textGeometry.translate(centerOffset_x, centerOffset_y, 0);
-            textGeometry.scale(1.2, 1.2, 1.2);
-            
-            const mesh = new THREE.Mesh(textGeometry, new THREE.MeshBasicMaterial());
-            const sampler = new THREE.MeshSurfaceSampler(mesh).build();
-            
-            let targetPositions = new Float32Array(totalParticles * 3);
-            const tempPosition = new THREE.Vector3();
-            
-            for (let i = 0; i < totalParticles; i++) {
-                sampler.sample(tempPosition);
-                targetPositions[i * 3] = tempPosition.x + (Math.random() - 0.5) * 0.02;
-                targetPositions[i * 3 + 1] = tempPosition.y + (Math.random() - 0.5) * 0.02;
-                targetPositions[i * 3 + 2] = tempPosition.z + (Math.random() - 0.5) * 0.02;
-            }
-            resolve(targetPositions);
-        });
-    });
-}
-
-function animate() {
-    requestAnimationFrame(animate);
-    
-    if (targetPositions && currentPositions) {
-        let positionsChanged = false;
-        
-        for (let i = 0; i < totalParticles * 3; i += 3) {
-            const cx = currentPositions.array[i];
-            const cy = currentPositions.array[i + 1];
-            const cz = currentPositions.array[i + 2];
-            const tx = targetPositions[i];
-            const ty = targetPositions[i + 1];
-            const tz = targetPositions[i + 2];
-            
-            currentPositions.array[i] = THREE.MathUtils.lerp(cx, tx, transitionSpeed);
-            currentPositions.array[i + 1] = THREE.MathUtils.lerp(cy, ty, transitionSpeed);
-            currentPositions.array[i + 2] = THREE.MathUtils.lerp(cz, tz, transitionSpeed);
-            
-            if (!positionsChanged) {
-                if (Math.abs(cx - tx) > epsilon || Math.abs(cy - ty) > epsilon || Math.abs(cz - tz) > epsilon) {
-                    positionsChanged = true;
-                }
-            }
-        }
-        currentPositions.needsUpdate = true;
-        
-        if (isTransitioning && !positionsChanged) {
-            isTransitioning = false;
-            if (isAnimatingToText) {
-                particles.rotation.y = 0;
-                setTimeout(triggerStreamlitTransition, 2000);
-            } 
-        }
-    }
-    
-    if (particles && !isAnimatingToText) {
-        particles.rotation.y += ROTATION_SPEED;
-    }
-    
-    renderer.render(scene, camera);
-}
-
-async function toggleShape() {
-    if (isTransitioning || isAnimatingToText) return; 
-    isAnimatingToText = true; 
-    isTransitioning = true;
-    
-    if (!textTargetPositions) {
-        textTargetPositions = await createTextPoints();
-    }
-    
-    targetPositions = textTargetPositions;
-    
-    const button = document.getElementById('toggleButton');
-    if (button) {
-        button.textContent = 'TRANSITIONING...';
-        button.style.opacity = '0.7';
-        button.style.cursor = 'wait';
-    }
-    
-    particles.rotation.y = 0;
-}
-
-async function init() {
-    setupScene();
-    createParticles(); 
-    textTargetPositions = await createTextPoints();
-    targetPositions = sphereTargetPositions;
-    
-    const button = document.getElementById('toggleButton');
-    if (button) {
-        button.addEventListener('click', toggleShape);
-    }
-    
-    animate(); 
-}
-
-window.addEventListener('DOMContentLoaded', init);
-
-window.addEventListener('resize', function() {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-    renderer.setSize(width, height);
-});
-
-document.body.style.backgroundColor = '#000000';
-document.body.style.overflow = 'hidden';
-</script>
 </body>
 </html>
 """
+
+# ==========================================
+# PORTADA ALTERNATIVA PARA COMMUNITY CLOUD (CUANDO THREE.JS FALLE)
+# ==========================================
+
+def create_simple_portal():
+    """Crea una portada alternativa si Three.js tiene problemas en Community Cloud"""
+    
+    st.markdown("""
+    <div style="
+        background: linear-gradient(135deg, #000428 0%, #004e92 100%);
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 2rem;
+    ">
+        <div style="
+            font-size: 48px;
+            font-weight: 800;
+            color: #00ffff;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.7);
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+        ">
+            FIN PLUS PORTAL
+        </div>
+        
+        <div style="
+            font-size: 18px;
+            color: #94a3b8;
+            letter-spacing: 2px;
+            margin-bottom: 60px;
+            max-width: 600px;
+        ">
+            Interactive Risk Analytics Dashboard
+        </div>
+        
+        <div style="
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 40px;
+            max-width: 800px;
+        ">
+            <div style="
+                background: rgba(0, 255, 255, 0.1);
+                border-radius: 15px;
+                padding: 20px;
+                width: 180px;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(0, 255, 255, 0.2);
+            ">
+                <div style="font-size: 36px; margin-bottom: 10px;">📊</div>
+                <div style="color: #ffffff; font-weight: 600;">Risk Analytics</div>
+            </div>
+            
+            <div style="
+                background: rgba(0, 255, 255, 0.1);
+                border-radius: 15px;
+                padding: 20px;
+                width: 180px;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(0, 255, 255, 0.2);
+            ">
+                <div style="font-size: 36px; margin-bottom: 10px;">📈</div>
+                <div style="color: #ffffff; font-weight: 600;">Real-time Metrics</div>
+            </div>
+            
+            <div style="
+                background: rgba(0, 255, 255, 0.1);
+                border-radius: 15px;
+                padding: 20px;
+                width: 180px;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(0, 255, 255, 0.2);
+            ">
+                <div style="font-size: 36px; margin-bottom: 10px;">🔍</div>
+                <div style="color: #ffffff; font-weight: 600;">Deep Insights</div>
+            </div>
+        </div>
+        
+        <div style="
+            color: #ffffff;
+            font-size: 14px;
+            max-width: 500px;
+            margin-top: 40px;
+            padding: 20px;
+            border-top: 1px solid rgba(0, 255, 255, 0.3);
+        ">
+            Advanced Credit Risk Assessment Platform • Powered by Machine Learning
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ==========================================
 # LÓGICA DE DATOS (MANTENIDO IGUAL)
@@ -968,34 +936,96 @@ def create_dashboard():
         if st.button("🔄 Regresar al Portal Interactivo", type="secondary", use_container_width=True):
             st.session_state.portal_complete = False
             st.rerun()
+    
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # ==========================================
-# LÓGICA PRINCIPAL
+# LÓGICA PRINCIPAL MEJORADA PARA COMMUNITY CLOUD
 # ==========================================
 
 if 'portal_complete' not in st.session_state:
     st.session_state.portal_complete = False
 
-# Botón fantasma para la transición
-st.markdown('<div class="ghost-button-container">', unsafe_allow_html=True)
-if st.button("ENTRAR_AL_DASHBOARD_TRIGGER", key="btn_trigger_hidden"):
-    st.session_state.portal_complete = True
-    st.rerun()
-st.markdown('</div>', unsafe_allow_html=True)
+# Botón fantasma mejorado para la transición
+st.markdown("""
+<div class="ghost-button-container">
+    <button id="hidden-trigger-btn" style="display: none;">Hidden Trigger</button>
+</div>
+""", unsafe_allow_html=True)
 
-# Lógica de renderizado
+# Inicializar estado para controlar la transición
+if 'show_entrar_button' not in st.session_state:
+    st.session_state.show_entrar_button = True
+
+# Lógica de renderizado optimizada para Community Cloud
 if not st.session_state.portal_complete:
-    # Mostrar portal Three.js
-    components.html(threejs_portal, height=1000, scrolling=False)
-    
-    # Mensaje de carga
-    with st.empty().container():
+    # Crear un contenedor para la portada
+    with st.container():
+        # Opción 1: Intentar con Three.js simplificado
+        try:
+            components.html(threejs_portal_simple, height=700, scrolling=False)
+        except:
+            # Opción 2: Si Three.js falla, mostrar portada alternativa
+            create_simple_portal()
+        
+        # Mostrar el botón ENTRAR siempre visible
         st.markdown("""
-        <div style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
-                    color: #94a3b8; font-size: 12px; text-align: center; z-index: 10000;">
-            🌀 Cargando portal interactivo...
+        <div style="
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            width: 100%;
+            text-align: center;
+        ">
+            <button class="portal-button" id="entrar-btn-visible">
+                ENTRAR AL DASHBOARD
+            </button>
         </div>
+        
+        <script>
+        // Script para manejar el botón visible
+        document.getElementById('entrar-btn-visible').onclick = function() {
+            // Hacer clic en el botón oculto de Streamlit
+            const hiddenBtn = window.parent.document.querySelector('[data-testid="baseButton-secondary"]');
+            if (hiddenBtn) {
+                hiddenBtn.click();
+            }
+        };
+        </script>
         """, unsafe_allow_html=True)
+        
+        # Botón de Streamlit que realmente activa la transición
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col2:
+            if st.button("ENTRAR AL DASHBOARD", type="secondary", key="portal_enter_button"):
+                st.session_state.portal_complete = True
+                st.rerun()
 else:
     # Mostrar dashboard
     create_dashboard()
+
+# JavaScript adicional para mejorar la compatibilidad
+st.markdown("""
+<script>
+// Script para mejorar compatibilidad con Community Cloud
+document.addEventListener('DOMContentLoaded', function() {
+    // Asegurar que el fondo sea correcto
+    document.body.style.backgroundColor = '#0f172a';
+    
+    // Prevenir desbordamientos problemáticos
+    const appContainer = document.querySelector('.stApp');
+    if (appContainer) {
+        appContainer.style.overflow = 'hidden';
+    }
+    
+    // Asegurar que el contenido principal esté visible
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) {
+        mainContent.style.position = 'relative';
+        mainContent.style.zIndex = '1';
+    }
+});
+</script>
+""", unsafe_allow_html=True)
