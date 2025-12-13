@@ -8,19 +8,47 @@ import numpy as np
 import plotly.express as px
 from sklearn.decomposition import PCA
 import warnings
+import joblib
+import pickle
+import os
 
 warnings.filterwarnings("ignore")
 
 # Configuración de la página
 st.set_page_config(
     page_title="Risk Analytics Dashboard",
-    page_icon="⚠️",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
 # ==========================================
-# CSS PERSONALIZADO (ACTUALIZADO)
+# CARGAR EL MODELO XGBOOST ENTRENADO
+# ==========================================
+
+@st.cache_resource
+def load_xgboost_model():
+    """Carga el modelo XGBoost entrenado"""
+    try:
+        # Cargar el pipeline entrenado
+        model_path = "C:/Users/PcVip/Downloads/xgb_pipeline_no_earlystop.joblib"
+        
+        if os.path.exists(model_path):
+            model = joblib.load(model_path)
+            st.success("✅ Modelo XGBoost cargado correctamente")
+            return model
+        else:
+            st.warning("⚠️ Archivo del modelo no encontrado. Usando modelo simulado.")
+            return None
+    except Exception as e:
+        st.error(f"❌ Error al cargar el modelo: {str(e)}")
+        return None
+
+# Cargar el modelo al inicio
+xgboost_model = load_xgboost_model()
+
+# ==========================================
+# CSS PERSONALIZADO (ACTUALIZADO MÁS AGRESIVAMENTE)
 # ==========================================
 st.markdown("""
 <style>
@@ -29,33 +57,35 @@ st.markdown("""
     footer {visibility: hidden;}
     header {visibility: hidden;}
     
-    /* Eliminar márgenes y paddings para fondo completo */
+    /* Eliminar márgenes y paddings para fondo completo - MÁS AGRESIVO */
     .block-container {
         padding-top: 0rem !important;
         padding-bottom: 0rem !important;
         padding-left: 0rem !important;
         padding-right: 0rem !important;
         max-width: 100% !important;
+        margin-top: -70px !important;
     }
     
-    /* Fondo del dashboard */
+    /* Fondo del dashboard - MODIFICADO: -70px en lugar de -80px */
     .stApp {
-        margin-top: -80px !important;
+        margin-top: -70px !important;
         background: #0f172a !important;
         min-height: 100vh !important;
         padding: 0 !important;
         margin: 0 !important;
     }
     
-    /* Contenedor principal del dashboard */
+    /* Contenedor principal del dashboard - AJUSTADO */
     .main-content {
         background: #0f172a;
         padding: 0rem 1.5rem;
         margin: 0 auto;
         max-width: 100%;
+        margin-top: 0px !important;
     }
     
-    /* Título principal de Riesgo - MÁS GRANDE */
+    /* Título principal de Riesgo - REDUCIDO padding-top */
     .risk-title {
         font-size: 32px !important;
         font-weight: 800 !important;
@@ -63,7 +93,7 @@ st.markdown("""
         margin-bottom: 0.5rem !important;
         text-align: center !important;
         letter-spacing: 2px !important;
-        padding-top: 1.5rem !important;
+        padding-top: 0.5rem !important;
     }
     
     /* Subtítulo de Riesgo - MÁS GRANDE */
@@ -600,53 +630,179 @@ document.body.style.overflow = 'hidden';
 """
 
 # ==========================================
-# LÓGICA DE DATOS (MANTENIDO IGUAL)
+# LÓGICA DE DATOS (ACTUALIZADA CON TODAS LAS CARACTERÍSTICAS)
 # ==========================================
 
-REQUIRED_FEATURES = ['AGE', 'INCOME', 'LOAN_AMOUNT']
-SIMULATED_FEATURES = ['AGE', 'INCOME', 'LOAN_AMOUNT', 'N_TRANSACCIONES', 'credit_utilization_mean']
+# Lista completa de características que espera el modelo XGBoost
+XGBOOST_FEATURES = [
+    'TOTAL_INCOME', 'AMOUNT_PRODUCT', 'INSTALLMENT', 'REGION_SCORE', 
+    'AGE_IN_YEARS', 'JOB_SENIORITY', 'HOME_SENIORITY', 'LAST_UPDATE', 
+    'CAR_AGE', 'FAMILY_SIZE', 'REACTIVE_SCORING', 'PROACTIVE_SCORING', 
+    'BEHAVIORAL_SCORING', 'DAYS_LAST_INFO_CHANGE', 'NUMBER_OF_PRODUCTS', 
+    'DIGITAL_CLIENT', 'NUM_PREVIOUS_LOAN_APP', 'LOAN_ANNUITY_PAYMENT_SUM', 
+    'LOAN_APPLICATION_AMOUNT_SUM', 'LOAN_CREDIT_GRANTED_SUM', 'NUM_STATUS_ANNULLED', 
+    'NUM_STATUS_AUTHORIZED', 'NUM_STATUS_DENIED', 'NUM_STATUS_NOT_USED', 
+    'NUM_FLAG_INSURED', 'CREDICT_CARD_BALANCE', 'CREDIT_CARD_LIMIT', 
+    'CREDIT_CARD_PAYMENT', 'NUMBER_DRAWINGS_ATM', 'NUMBER_DRAWINGS', 
+    'NUMBER_INSTALMENTS', 'KPI_DAYS_LAST_MOV', 'KPI_TOTAL_SPEND', 
+    'KPI_DEBT_RATIO', 'KPI_LOAN_VOLATILITY', 'KPI_APPROVAL_RATIO', 
+    'KPI_DENIAL_RATE', 'NAME_PRODUCT_TYPE_IDX', 'GENDER_IDX', 
+    'EDUCATION_IDX', 'MARITAL_STATUS_IDX', 'HOME_SITUATION_IDX', 
+    'OWN_INSURANCE_CAR_IDX', 'OCCUPATION_IDX', 'HOME_OWNER_IDX', 
+    'EMPLOYER_ORGANIZATION_TYPE_IDX', 'KPI_AGE_GROUP_IDX'
+]
+
+# Características mínimas requeridas para la simulación
+REQUIRED_FEATURES_SIMULATED = ['TOTAL_INCOME', 'AGE_IN_YEARS', 'AMOUNT_PRODUCT']
 
 @st.cache_data
 def simulate_risk_data():
+    """Simula datos de riesgo con todas las características del modelo XGBoost"""
     np.random.seed(42)
     N = 1000
-    df = pd.DataFrame({
-        'CLIENT_ID': range(1000, 1000 + N),
-        'AGE': np.random.randint(20, 70, N),
-        'INCOME': np.random.rand(N) * 150000,
-        'LOAN_AMOUNT': np.random.rand(N) * 50000,
-        'N_TRANSACCIONES': np.random.randint(1, 500, N),
-        'credit_utilization_mean': np.random.rand(N) * 0.9 + 0.1
-    })
     
-    importances = np.array([0.45, 0.30, 0.15, 0.07, 0.03])
+    # Crear DataFrame con todas las características necesarias
+    data = {
+        'CLIENT_ID': range(1000, 1000 + N),
+    }
+    
+    # Generar valores para todas las características
+    for feature in XGBOOST_FEATURES:
+        if feature in ['TOTAL_INCOME', 'AMOUNT_PRODUCT', 'INSTALLMENT', 'LOAN_ANNUITY_PAYMENT_SUM',
+                      'LOAN_APPLICATION_AMOUNT_SUM', 'LOAN_CREDIT_GRANTED_SUM', 'CREDICT_CARD_BALANCE',
+                      'CREDIT_CARD_LIMIT', 'CREDIT_CARD_PAYMENT']:
+            data[feature] = np.random.rand(N) * 50000 + 1000
+        elif feature in ['AGE_IN_YEARS']:
+            data[feature] = np.random.randint(20, 70, N)
+        elif feature in ['JOB_SENIORITY', 'HOME_SENIORITY', 'CAR_AGE', 'FAMILY_SIZE']:
+            data[feature] = np.random.randint(0, 30, N)
+        elif feature in ['REGION_SCORE', 'REACTIVE_SCORING', 'PROACTIVE_SCORING', 'BEHAVIORAL_SCORING']:
+            data[feature] = np.random.rand(N) * 100
+        elif feature in ['LAST_UPDATE', 'DAYS_LAST_INFO_CHANGE', 'KPI_DAYS_LAST_MOV']:
+            data[feature] = np.random.randint(0, 365, N)
+        elif feature in ['NUMBER_OF_PRODUCTS', 'NUM_PREVIOUS_LOAN_APP', 'NUMBER_DRAWINGS_ATM',
+                        'NUMBER_DRAWINGS', 'NUMBER_INSTALMENTS']:
+            data[feature] = np.random.randint(0, 20, N)
+        elif feature in ['DIGITAL_CLIENT', 'NUM_FLAG_INSURED']:
+            data[feature] = np.random.randint(0, 2, N)
+        elif feature in ['NUM_STATUS_ANNULLED', 'NUM_STATUS_AUTHORIZED', 'NUM_STATUS_DENIED',
+                        'NUM_STATUS_NOT_USED']:
+            data[feature] = np.random.randint(0, 10, N)
+        elif feature in ['KPI_TOTAL_SPEND', 'KPI_DEBT_RATIO', 'KPI_LOAN_VOLATILITY',
+                        'KPI_APPROVAL_RATIO', 'KPI_DENIAL_RATE']:
+            data[feature] = np.random.rand(N)
+        elif feature.endswith('_IDX'):
+            data[feature] = np.random.randint(0, 10, N)
+        else:
+            data[feature] = np.random.rand(N)
+    
+    df = pd.DataFrame(data)
+    
+    # Usar el modelo XGBoost si está disponible, de lo contrario usar simulación
+    if xgboost_model is not None:
+        try:
+            # Preparar datos para el modelo
+            X = df[XGBOOST_FEATURES]
+            probs = xgboost_model.predict_proba(X)[:, 1]
+            preds = (probs >= 0.5).astype(int)
+        except Exception as e:
+            st.warning(f"Error usando modelo XGBoost: {str(e)}. Usando simulación.")
+            # Simulación simple basada en características principales
+            probs = 0.1 + (df['TOTAL_INCOME'] < 30000) * 0.3 + (df['AMOUNT_PRODUCT'] > 20000) * 0.3
+            probs = np.clip(probs + np.random.normal(0, 0.1, len(df)), 0.01, 0.99)
+            preds = (probs >= 0.5).astype(int)
+    else:
+        # Simulación simple
+        probs = 0.1 + (df['TOTAL_INCOME'] < 30000) * 0.3 + (df['AMOUNT_PRODUCT'] > 20000) * 0.3
+        probs = np.clip(probs + np.random.normal(0, 0.1, len(df)), 0.01, 0.99)
+        preds = (probs >= 0.5).astype(int)
+    
+    # Crear DataFrame de importancia de características (simulado)
+    importances = np.random.rand(len(XGBOOST_FEATURES[:10]))  # Solo mostrar top 10
+    importances = importances / importances.sum()
     df_importance = pd.DataFrame({
-        'Feature': SIMULATED_FEATURES,
+        'Feature': XGBOOST_FEATURES[:10],
         'Importance': importances
     }).sort_values(by='Importance', ascending=False)
     df_importance['Importance_Norm'] = (df_importance['Importance'] / df_importance['Importance'].sum()) * 100
 
-    results, scaled_data = process_data_and_predict(df.copy())
-    return results, scaled_data, df_importance, SIMULATED_FEATURES
+    results = pd.DataFrame({
+        'CLIENT_ID': df['CLIENT_ID'].values,
+        'PROBABILIDAD_NON_COMPLIANT': probs,
+        'PREDICCION': preds
+    })
+    results['Nivel_Riesgo'] = results['PREDICCION'].map({0:'BAJO RIESGO',1:'ALTO RIESGO'})
+    
+    # Para PCA, usar solo algunas características principales
+    scaled_data = df[['TOTAL_INCOME', 'AGE_IN_YEARS', 'AMOUNT_PRODUCT']].apply(
+        lambda x: (x - x.mean()) / x.std() if x.std() > 0 else 0, axis=0
+    ).values
+    
+    return results, scaled_data, df_importance, XGBOOST_FEATURES[:10]
 
 @st.cache_data(show_spinner="Calculando predicciones de riesgo...")
 def process_data_and_predict(df_input: pd.DataFrame):
-    for feature in REQUIRED_FEATURES:
+    """Procesa datos y realiza predicciones usando el modelo XGBoost"""
+    
+    # Verificar características mínimas requeridas
+    min_features = ['TOTAL_INCOME', 'AGE_IN_YEARS', 'AMOUNT_PRODUCT']
+    for feature in min_features:
         if feature not in df_input.columns:
             st.error(f"Falta la columna requerida: **{feature}**.")
             return pd.DataFrame(), np.array([])
     
+    # Asignar ID de cliente si no existe
     if 'CLIENT_ID' not in df_input.columns:
         df_input['CLIENT_ID'] = range(1000, 1000 + len(df_input))
-
-    probs = 0.1 + (df_input['INCOME'] < 50000) * 0.3 + (df_input['LOAN_AMOUNT'] > 30000) * 0.3
     
-    if len(df_input) > 0:
-        probs = np.clip(probs + np.random.normal(0, 0.1, len(df_input)), 0.01, 0.99)
+    # Generar características faltantes para el modelo XGBoost si es necesario
+    for feature in XGBOOST_FEATURES:
+        if feature not in df_input.columns:
+            # Generar valores aleatorios según el tipo de característica
+            if feature in ['TOTAL_INCOME', 'AMOUNT_PRODUCT', 'INSTALLMENT', 'LOAN_ANNUITY_PAYMENT_SUM',
+                          'LOAN_APPLICATION_AMOUNT_SUM', 'LOAN_CREDIT_GRANTED_SUM', 'CREDICT_CARD_BALANCE',
+                          'CREDIT_CARD_LIMIT', 'CREDIT_CARD_PAYMENT']:
+                df_input[feature] = np.random.rand(len(df_input)) * 50000 + 1000
+            elif feature in ['AGE_IN_YEARS']:
+                df_input[feature] = np.random.randint(20, 70, len(df_input))
+            elif feature in ['JOB_SENIORITY', 'HOME_SENIORITY', 'CAR_AGE', 'FAMILY_SIZE']:
+                df_input[feature] = np.random.randint(0, 30, len(df_input))
+            elif feature in ['REGION_SCORE', 'REACTIVE_SCORING', 'PROACTIVE_SCORING', 'BEHAVIORAL_SCORING']:
+                df_input[feature] = np.random.rand(len(df_input)) * 100
+            elif feature in ['LAST_UPDATE', 'DAYS_LAST_INFO_CHANGE', 'KPI_DAYS_LAST_MOV']:
+                df_input[feature] = np.random.randint(0, 365, len(df_input))
+            elif feature in ['NUMBER_OF_PRODUCTS', 'NUM_PREVIOUS_LOAN_APP', 'NUMBER_DRAWINGS_ATM',
+                            'NUMBER_DRAWINGS', 'NUMBER_INSTALMENTS']:
+                df_input[feature] = np.random.randint(0, 20, len(df_input))
+            elif feature in ['DIGITAL_CLIENT', 'NUM_FLAG_INSURED']:
+                df_input[feature] = np.random.randint(0, 2, len(df_input))
+            elif feature in ['NUM_STATUS_ANNULLED', 'NUM_STATUS_AUTHORIZED', 'NUM_STATUS_DENIED',
+                            'NUM_STATUS_NOT_USED']:
+                df_input[feature] = np.random.randint(0, 10, len(df_input))
+            elif feature in ['KPI_TOTAL_SPEND', 'KPI_DEBT_RATIO', 'KPI_LOAN_VOLATILITY',
+                            'KPI_APPROVAL_RATIO', 'KPI_DENIAL_RATE']:
+                df_input[feature] = np.random.rand(len(df_input))
+            elif feature.endswith('_IDX'):
+                df_input[feature] = np.random.randint(0, 10, len(df_input))
+            else:
+                df_input[feature] = np.random.rand(len(df_input))
+    
+    # Usar el modelo XGBoost si está disponible
+    if xgboost_model is not None:
+        try:
+            # Preparar datos para el modelo
+            X = df_input[XGBOOST_FEATURES]
+            probs = xgboost_model.predict_proba(X)[:, 1]
+            preds = (probs >= 0.5).astype(int)
+        except Exception as e:
+            st.warning(f"Error usando modelo XGBoost: {str(e)}. Usando simulación.")
+            probs = 0.1 + (df_input['TOTAL_INCOME'] < 30000) * 0.3 + (df_input['AMOUNT_PRODUCT'] > 20000) * 0.3
+            probs = np.clip(probs + np.random.normal(0, 0.1, len(df_input)), 0.01, 0.99)
+            preds = (probs >= 0.5).astype(int)
     else:
-        probs = np.clip(probs, 0.01, 0.99)
-        
-    preds = (probs >= 0.5).astype(int)
+        probs = 0.1 + (df_input['TOTAL_INCOME'] < 30000) * 0.3 + (df_input['AMOUNT_PRODUCT'] > 20000) * 0.3
+        probs = np.clip(probs + np.random.normal(0, 0.1, len(df_input)), 0.01, 0.99)
+        preds = (probs >= 0.5).astype(int)
     
     results = pd.DataFrame({
         'CLIENT_ID': df_input['CLIENT_ID'].values,
@@ -655,12 +811,15 @@ def process_data_and_predict(df_input: pd.DataFrame):
     })
     results['Nivel_Riesgo'] = results['PREDICCION'].map({0:'BAJO RIESGO',1:'ALTO RIESGO'})
 
-    scaled_data = df_input[REQUIRED_FEATURES].apply(lambda x: (x - x.mean()) / x.std(), axis=0).values
+    # Para PCA, usar solo algunas características principales
+    scaled_data = df_input[['TOTAL_INCOME', 'AGE_IN_YEARS', 'AMOUNT_PRODUCT']].apply(
+        lambda x: (x - x.mean()) / x.std() if x.std() > 0 else 0, axis=0
+    ).values
     
     return results, scaled_data
 
 # ==========================================
-# FUNCIÓN DEL DASHBOARD (MANTENIDO IGUAL)
+# FUNCIÓN DEL DASHBOARD (MODIFICADA)
 # ==========================================
 
 def create_dashboard():
@@ -671,37 +830,33 @@ def create_dashboard():
     # Título principal - MÁS GRANDE Y MEJOR ESPACIADO
     st.markdown("""
     <div style="text-align: center; padding: 2rem 0 1rem 0;">
-        <div class="risk-title">⚠️ Risk Analytics Platform</div>
-        <div class="risk-subtitle">MODELO DE RIESGO CREDITICIO</div>
+        <div class="risk-title">Risk Analytics Platform</div>
+        <div class="risk-subtitle">MODELO DE RIESGO CREDITICIO XGBOOST</div>
+        <div style="color: #00ffff; font-size: 14px; margin-top: 0.5rem;">
+            {'✅ Modelo XGBoost' if xgboost_model is not None else '⚠️ Modelo Simulado'}
+        </div>
     </div>
     """, unsafe_allow_html=True)
     
     # Separador elegante
     st.markdown('<hr>', unsafe_allow_html=True)
     
-    # --- SECCIÓN DE CARGA DE DATOS - CON NOMBRE INTUITIVO ---
+    # --- SECCIÓN DE CARGA DE DATOS - SIMPLIFICADA (QUITADO EL CUADRADO) ---
     
     # Título intuitivo para cargar CSV
     st.markdown("""
     <div class="upload-title">
-        📁 CARGAR DATOS DE CLIENTES (CSV)
+        CARGAR DATOS DE CLIENTES (CSV)
+    </div>
+    <div style="text-align: center; color: #94a3b8; font-size: 12px; margin-bottom: 1rem;">
+        <strong>Características mínimas requeridas:</strong> TOTAL_INCOME, AGE_IN_YEARS, AMOUNT_PRODUCT<br>
+        <em>Las características faltantes se generarán automáticamente</em>
     </div>
     """, unsafe_allow_html=True)
     
-    # Contenedor centrado para el upload box
-    st.markdown("""
-    <div style="display: flex; justify-content: center; width: 100%;">
-        <div class="upload-box">
-    """, unsafe_allow_html=True)
-    
-    # File uploader dentro del contenedor centrado - CON NOMBRE MÁS INTUITIVO
+    # SOLO MOSTRAR EL FILE UPLOADER SIN EL CONTENEDOR CUADRADO
     uploaded_file = st.file_uploader("Seleccionar archivo CSV de datos de clientes", type="csv", 
                                      help="Sube un archivo CSV con información de clientes para analizar")
-    
-    st.markdown("""
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
     
     # Inicializar con datos simulados
     results, scaled, df_importance, feature_names = simulate_risk_data()
@@ -719,12 +874,12 @@ def create_dashboard():
                 st.markdown("""
                 <div style="display: flex; justify-content: center; margin: 1rem 0;">
                     <div style="background-color: #10b981; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; text-align: center;">
-                        ✅ Datos cargados correctamente: <strong>{}</strong> registros procesados
+                        Datos cargados correctamente: <strong>{}</strong> registros procesados
                     </div>
                 </div>
                 """.format(len(results)), unsafe_allow_html=True)
         except Exception as e:
-            st.error(f"❌ Error al procesar archivo: {e}")
+            st.error(f"Error al procesar archivo: {e}")
     
     # --- CÁLCULOS ---
     alto_riesgo_count = sum(results.PREDICCION)
@@ -748,7 +903,7 @@ def create_dashboard():
     # Usar 2 filas de 2 columnas cada una para mejor distribución en pantallas grandes
     col1, col2, col3, col4 = st.columns(4)
     
-    def metric_card(col, label, value, color, icon="📊"):
+    def metric_card(col, label, value, color, icon=""):
         col.markdown(f"""
         <div class="metric-card-risk" style="border-left: 6px solid {color};">
             <div style="display: flex; align-items: center; margin-bottom: 1rem;">
@@ -763,22 +918,22 @@ def create_dashboard():
     rate = f"{alto_riesgo_count/total_count:.1%}" if total_count > 0 else "0%"
     
     # Mostrar métricas
-    metric_card(col1, "TOTAL CLIENTES", f"{total_count:,}", "#00ffff", "👥")
-    metric_card(col2, "TASA ALTO RIESGO", rate, "#ff4b4b", "⚠️")
-    metric_card(col3, "ALTO RIESGO", f"{alto_riesgo_count:,}", "#ff4b4b", "🔴")
-    metric_card(col4, "PROBABILIDAD MEDIA", f"{prob_promedio:.2f}%", "#fdb400", "📈")
+    metric_card(col1, "TOTAL CLIENTES", f"{total_count:,}", "#00ffff")
+    metric_card(col2, "TASA ALTO RIESGO", rate, "#ff4b4b" )
+    metric_card(col3, "ALTO RIESGO", f"{alto_riesgo_count:,}", "#ff4b4b")
+    metric_card(col4, "PROBABILIDAD MEDIA", f"{prob_promedio:.2f}%", "#fdb400")
     
     # Separador
     st.markdown('<hr>', unsafe_allow_html=True)
     
     # --- Fila 2: Visualizaciones - MEJOR DISTRIBUIDAS ---
-    st.markdown('<div class="section-title">📊 Visualizaciones del Modelo</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title"> Visualizaciones del Modelo</div>', unsafe_allow_html=True)
     
     # Primera fila de gráficos
     col_viz1, col_viz2 = st.columns(2)
     
     with col_viz1:
-        st.markdown("<h4>📊 Distribución de Riesgo</h4>", unsafe_allow_html=True)
+        st.markdown("<h4> Distribución de Riesgo</h4>", unsafe_allow_html=True)
         if total_count > 0:
             pie_fig = px.pie(
                 results, names="Nivel_Riesgo", title="",
@@ -800,7 +955,7 @@ def create_dashboard():
             st.plotly_chart(pie_fig, use_container_width=True)
     
     with col_viz2:
-        st.markdown("<h4>📈 Densidad de Probabilidad</h4>", unsafe_allow_html=True)
+        st.markdown("<h4> Densidad de Probabilidad</h4>", unsafe_allow_html=True)
         if total_count > 0:
             density_fig = go.Figure()
             density_fig.add_trace(go.Histogram(
@@ -830,7 +985,7 @@ def create_dashboard():
     col_viz3, col_viz4 = st.columns(2)
     
     with col_viz3:
-        st.markdown("<h4>🗺️ Mapa PCA (Segmentación)</h4>", unsafe_allow_html=True)
+        st.markdown("<h4>Mapa PCA (Segmentación)</h4>", unsafe_allow_html=True)
         try:
             if scaled.shape[0] > 1 and scaled.shape[1] >= 2:
                 pca = PCA(min(2, scaled.shape[1]))
@@ -857,12 +1012,12 @@ def create_dashboard():
                 )
                 st.plotly_chart(pca_plot, use_container_width=True)
             else:
-                st.info("📊 Datos insuficientes para análisis PCA")
+                st.info(" Datos insuficientes para análisis PCA")
         except Exception as e:
-            st.info(f"📊 Error en PCA: {str(e)[:50]}...")
+            st.info(f" Error en PCA: {str(e)[:50]}...")
     
     with col_viz4:
-        st.markdown("<h4>🏆 Top 5 Variables Importantes</h4>", unsafe_allow_html=True)
+        st.markdown("<h4>Top 5 Variables Importantes</h4>", unsafe_allow_html=True)
         if not df_importance.empty:
             importance_fig = px.bar(
                 df_importance.head(5), 
@@ -895,12 +1050,12 @@ def create_dashboard():
     st.markdown('<hr>', unsafe_allow_html=True)
     
     # --- Fila 3: Tabla y Exportación - MEJOR ORGANIZADO ---
-    st.markdown('<div class="section-title">📋 Resultados y Exportación</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Resultados y Exportación</div>', unsafe_allow_html=True)
     
     col_data, col_export = st.columns([3, 1])
     
     with col_data:
-        st.markdown("#### 📜 Resultados de Predicción")
+        st.markdown("####Resultados de Predicción")
         if total_count > 0:
             # Formatear mejor la tabla
             df_display = results[['CLIENT_ID', 'PROBABILIDAD_NON_COMPLIANT', 'Nivel_Riesgo']].copy()
@@ -924,7 +1079,7 @@ def create_dashboard():
             )
     
     with col_export:
-        st.markdown("#### 📥 Exportar Resultados")
+        st.markdown("#### Exportar Resultados")
         st.markdown("---")
         
         # Estadísticas rápidas
@@ -936,7 +1091,7 @@ def create_dashboard():
         if total_count > 0:
             csv_data = results.to_csv(index=False).encode('utf-8')
             st.download_button(
-                label="⬇️ Descargar CSV Completo",
+                label="⬇ Descargar CSV Completo",
                 data=csv_data,
                 file_name="predicciones_riesgo_completo.csv",
                 mime="text/csv",
@@ -944,8 +1099,8 @@ def create_dashboard():
             )
             
             # Botón para reporte resumido
-            if st.button("📄 Generar Reporte PDF", use_container_width=True):
-                st.info("🔄 Funcionalidad de PDF en desarrollo...")
+            if st.button(" Generar Reporte PDF", use_container_width=True):
+                st.info(" Funcionalidad de PDF en desarrollo...")
     
     # Footer del dashboard
     st.markdown("""
@@ -953,9 +1108,9 @@ def create_dashboard():
         <div style="font-size: 16px; font-weight: 600; margin-bottom: 0.5rem; color: #00ffff;">
             Fin Plus Analytics Platform
         </div>
-        <div style="margin-bottom: 1rem;">Modelo predictivo de riesgo crediticio • Versión 2.0</div>
+        <div style="margin-bottom: 1rem;">Modelo predictivo de riesgo crediticio XGBoost • Versión 2.0</div>
         <div style="font-size: 12px; color: #94a3b8;">
-            <div>Powered by Three.js Interactive Portal • Streamlit • Plotly</div>
+            <div>Powered by Three.js Interactive Portal • Streamlit • Plotly • XGBoost</div>
             <div style="margin-top: 0.5rem;">© 2024 Fin Plus Analytics. Todos los derechos reservados.</div>
         </div>
     </div>
@@ -976,26 +1131,20 @@ def create_dashboard():
 if 'portal_complete' not in st.session_state:
     st.session_state.portal_complete = False
 
-# Botón fantasma para la transición
-st.markdown('<div class="ghost-button-container">', unsafe_allow_html=True)
-if st.button("ENTRAR_AL_DASHBOARD_TRIGGER", key="btn_trigger_hidden"):
-    st.session_state.portal_complete = True
-    st.rerun()
-st.markdown('</div>', unsafe_allow_html=True)
+# Solo mostrar el botón fantasma cuando NO estemos en el dashboard
+if not st.session_state.portal_complete:
+    st.markdown('<div class="ghost-button-container">', unsafe_allow_html=True)
+    if st.button("ENTRAR_AL_DASHBOARD_TRIGGER", key="btn_trigger_hidden"):
+        st.session_state.portal_complete = True
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # Lógica de renderizado
 if not st.session_state.portal_complete:
     # Mostrar portal Three.js
     components.html(threejs_portal, height=1000, scrolling=False)
     
-    # Mensaje de carga
-    with st.empty().container():
-        st.markdown("""
-        <div style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
-                    color: #94a3b8; font-size: 12px; text-align: center; z-index: 10000;">
-            🌀 Cargando portal interactivo...
-        </div>
-        """, unsafe_allow_html=True)
+    
 else:
     # Mostrar dashboard
     create_dashboard()
