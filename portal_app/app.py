@@ -30,15 +30,23 @@ st.set_page_config(
 def load_xgboost_model():
     """Carga el modelo XGBoost entrenado"""
     try:
-        # Cargar el pipeline entrenado
-        model_path = "C:/Users/PcVip/Downloads/xgb_pipeline_no_earlystop.joblib"
+        # Rutas para Streamlit Community (rutas relativas)
+        joblib_path = "models/xgb_pipeline_no_earlystop.joblib"
+        h5_path = "models/xgb_pipeline_no_earlystop.h5"
         
-        if os.path.exists(model_path):
-            model = joblib.load(model_path)
-            st.success("✅ Modelo XGBoost cargado correctamente")
+        # Intentar cargar primero el modelo joblib
+        if os.path.exists(joblib_path):
+            model = joblib.load(joblib_path)
+            st.success("✅ Modelo XGBoost (joblib) cargado correctamente")
             return model
+        # Si no existe joblib, intentar cargar h5
+        elif os.path.exists(h5_path):
+            st.info("ℹ️ Modelo .h5 encontrado - Nota: Se necesita implementar carga específica para .h5")
+            # Para cargar modelo .h5 necesitarías: from tensorflow.keras.models import load_model
+            # model = load_model(h5_path)
+            return None
         else:
-            st.warning("⚠️ Archivo del modelo no encontrado. Usando modelo simulado.")
+            st.warning("⚠️ Archivos del modelo no encontrados en 'models/'. Usando modelo simulado.")
             return None
     except Exception as e:
         st.error(f"❌ Error al cargar el modelo: {str(e)}")
@@ -828,12 +836,14 @@ def create_dashboard():
     st.markdown('<div class="main-content">', unsafe_allow_html=True)
     
     # Título principal - MÁS GRANDE Y MEJOR ESPACIADO
-    st.markdown("""
+    model_status = "✅ Modelo XGBoost" if xgboost_model is not None else "⚠️ Modelo Simulado"
+    
+    st.markdown(f"""
     <div style="text-align: center; padding: 2rem 0 1rem 0;">
         <div class="risk-title">Risk Analytics Platform</div>
         <div class="risk-subtitle">MODELO DE RIESGO CREDITICIO XGBOOST</div>
         <div style="color: #00ffff; font-size: 14px; margin-top: 0.5rem;">
-            {'✅ Modelo XGBoost' if xgboost_model is not None else '⚠️ Modelo Simulado'}
+            {model_status}
         </div>
     </div>
     """, unsafe_allow_html=True)
