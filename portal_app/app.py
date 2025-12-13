@@ -37,11 +37,11 @@ def load_xgboost_model():
         # Intentar cargar primero el modelo joblib
         if os.path.exists(joblib_path):
             model = joblib.load(joblib_path)
-            st.success("✅ Modelo XGBoost (joblib) cargado correctamente")
+            st.success("Modelo XGBoost (joblib) cargado correctamente")
             return model
         # Si no existe joblib, intentar cargar h5
         elif os.path.exists(h5_path):
-            st.info("ℹ️ Modelo .h5 encontrado - Nota: Se necesita implementar carga específica para .h5")
+            st.info("ℹ Modelo .h5 encontrado - Nota: Se necesita implementar carga específica para .h5")
             # Para cargar modelo .h5 necesitarías: from tensorflow.keras.models import load_model
             # model = load_model(h5_path)
             return None
@@ -1107,10 +1107,6 @@ def create_dashboard():
                 mime="text/csv",
                 use_container_width=True
             )
-            
-            # Botón para reporte resumido
-            if st.button(" Generar Reporte PDF", use_container_width=True):
-                st.info(" Funcionalidad de PDF en desarrollo...")
     
     # Footer del dashboard
     st.markdown("""
