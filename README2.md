@@ -11,9 +11,9 @@
 
 ## 1. 💡 Resumen y Objetivo Estratégico
 
-Este repositorio contiene la solución completa *end-to-end* desarrollada por **Big-Daddy** para el "FinPlus Analytics Challenge". El proyecto se enfoca en la implementación de una arquitectura de datos robusta usando Docker y PySpark para generar inteligencia de negocio avanzada.
+Este repositorio contiene la solución completa única desarrollada por **Big-Daddy** para  "FinPlus Analytics Challenge". El proyecto se enfoca en la implementación de una arquitectura de datos robusta usando Docker y PySpark para generar inteligencia de negocio avanzada.
 
-Nuestro objetivo es transformar los datos crudos de clientes (demográficos, digitales y transaccionales) en una **inteligencia de negocio predictiva y accionable**.
+Nuestro objetivo es transformar los datos crudos de clientes (demográficos, digitales y transaccionales) en una inteligencia de negocio predictiva y accionable.
 
 ### Objetivos Clave de la Solución:
 
@@ -36,11 +36,11 @@ El diseño del proyecto utiliza un modelo de **Arquitectura por Capas (Layered A
 
 * **Paradigma:** Arquitectura por Capas, enfoque en Batch Processing.
 * **Motor Principal:** **Apache Spark / PySpark**. Es esencial para manejar el Volumen y la Variedad de los datos transaccionales.
-* **Almacenamiento Final:** **Master_FINAL_CONSOLIDADO.parquet** en formato **Parquet**. Este formato columnar optimiza la compresión y la velocidad de consulta en la capa de BI y Machine Learning.
+* **Almacenamiento Final:** **Master_FINAL_CONSOLIDADO.parquet** en formato Parquet.
 
 ### 2.2. Flujo ETL (Extracción, Transformación, Carga)
 
-El flujo modular se implementa en PySpark dentro de la *Curated Layer*.
+Es el pipeline de procesamiento que permite Extraer(E), Tranformar(T) y Cargar(L) los datos inciales, opera bajo el motor de PySpark en un flujo modular dentro de la *Curated Layer*.
 
 #### A. Extracción (E)
 Se ingesta la información demográfica/contractual (`CLIENTS.csv`) y el comportamiento transaccional (`BEHAVIOURAL.parquet`) usando DataFrames distribuidos de PySpark.
@@ -67,7 +67,7 @@ Se realiza un **LEFT JOIN** de todos los DataFrames de métricas sobre el Master
 
 | Miembro | Rol Principal Asignado | Funciones Clave y Tareas Ejecutadas |
 | :--- | :--- | :--- |
-| **Jose Luis Pérez** | **Project Lead & Data Architect** | Liderazgo estratégico, gobernanza (GitHub, Docker), y diseño final del Cuadro de Mando en Tableau. |
+| **Jose Luis Pérez** | **Project Lead & Data Architect** | Liderazgo estratégico, gobernanza (GitHub, Docker), documentación inicial(README.md) y Modelado predictivo y Diseño final del Cuadro de Mando enT ableau. |
 | **Claudia Torres** | **Data Engineer (Especialista ETL)** | Implementación del flujo ETL en PySpark, limpieza de datos, imputación estratégica y creación de la Curated Layer. |
 | **Núria Mayoral** | **Data Analyst** | Desarrollo de la lógica de los 7 indicadores de comportamiento (RFMI, Riesgo, Anomalía, etc.) y la segmentación. |
 | **Benjamín Carbonell** | **ML Specialist & Visualization Analyst** | Desarrollo y entrenamiento de los modelos predictivos. Implementación y construcción de *dashboards* en Tableau. |
@@ -89,7 +89,7 @@ El proyecto se desarrolló con un enfoque ágil en 3 semanas:
 | **M1: Entorno Operativo** | Entorno técnico configurado. |
 | **M2: Master View Lista** | Capa Curada creada y validada. |
 | **M3: Inteligencia Analítica** | Todos los 7 indicadores calculados y Modelos Predictivos entrenados. |
-| **M4: Solución Completa** | Documentación y 7 Dashboards de Tableau finalizados. |
+| **M4: Solución Completa** | Documentación y 6 Dashboards de Tableau finalizados. |
 
 ---
 
