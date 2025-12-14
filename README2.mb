@@ -45,18 +45,16 @@ El diseño del proyecto utiliza un modelo de **Arquitectura por Capas (Layered A
 
 El flujo modular se implementa en PySpark dentro de la *Curated Layer*.
 
-
-
 #### A. Extracción (E)
 Se ingesta la información demográfica/contractual (`CLIENTS.csv`) y el comportamiento transaccional (`BEHAVIOURAL.parquet`) usando DataFrames distribuidos de PySpark.
 
 #### B. Transformación (T)
-1.  **Limpieza y Normalización:**
+1.  **Limpieza y Normalización:**
     * **Imputación Estratégica:** Se rellenan variables de *scoring* o antigüedad (CAR AGE, JOB\_SENIORITY) con **-1** (valor sentinel).
     * Las variables de historial de préstamo se rellenan con **0** (asumiendo "Sin Historial").
     * Las variables categóricas (ej., EDUCATION) se rellenan con **'UNKNOWN'**.
     * **Normalización:** Las 10 variables categóricas se convierten a valores numéricos discretos mediante **Label Encoding (StringIndexer)**.
-2.  **Feature Engineering:** Creación de las 7 dimensiones de valor del cliente:
+2.  **Feature Engineering:** Creación de las 7 dimensiones de valor del cliente:
     * **Métricas RFMI:** Recencia (`DAYS SINCE LAST_TXN`), Frecuencia (`FREQUENCY_COUNT`), e Intensidad (`INTENSITY_AVG_SPEND`).
     * **Riesgo Operativo:** Cálculo del `PAYMENT FIDELITY RATIO`.
     * **Targets ML:** Creación de variables binarias `Y` (`Y_RISK_CHURN`) y `T` (`TREATMENT_GROUP`) para modelado Causal (Uplift).
@@ -105,31 +103,31 @@ Utilizamos **GitHub** para el control de versiones, asegurando que el código se
 
 ### Requisitos Previos
 
-1.  **Git** (para clonar el repositorio).
-2.  **Docker Desktop** (para el entorno reproducible).
+1.  **Git** (para clonar el repositorio).
+2.  **Docker Desktop** (para el entorno reproducible).
 
 ### 4.1. Puesta en Marcha del Entorno
 
 1.  **Clonar el Repositorio:**
-    ```bash
-    git clone [https://github.com/joseluis004/Big-Daddy.git](https://github.com/joseluis004/Big-Daddy.git)
-    ```
-2.  **Navegar a la Carpeta del Proyecto:**
-    ```bash
-    cd Big-Daddy/
-    ```
-3.  **Navegar a la Carpeta de Configuración Docker:**
-    ```bash
-    cd docker_big_daddy/
-    ```
-4.  **Construir el Entorno (Instala PySpark, Python, librerías):**
-    ```bash
-    docker-compose build
-    ```
-5.  **Ejecutar el Contenedor (Inicia JupyterLab):**
-    ```bash
-    docker-compose up
-    ```
+    ```bash
+    git clone [https://github.com/joseluis004/Big-Daddy.git](https://github.com/joseluis004/Big-Daddy.git)
+    cd Big-Daddy/
+    ```
+
+2.  **Navegar a la Carpeta de Configuración Docker:**
+    ```bash
+    cd docker_big_daddy/
+    ```
+
+3.  **Construir el Entorno (Instala PySpark, Python, librerías):**
+    ```bash
+    docker-compose build
+    ```
+
+4.  **Ejecutar el Contenedor (Inicia JupyterLab):**
+    ```bash
+    docker-compose up
+    ```
     *Una vez iniciado, acceda al enlace `http://localhost:8888` (o el que se muestre en la terminal) en su navegador para entrar a JupyterLab.*
 
 ### 4.2. Ejecución del Pipeline Analítico
@@ -139,12 +137,12 @@ El proceso de ETL, Feature Engineering y Modelado se realiza mediante la ejecuci
 1.  En la interfaz de JupyterLab, navegue a la carpeta **`notebooks/`**.
 
 2.  **Paso 1: TRATAMIENTO DE DATOS**
-    * Abrir y ejecutar completamente el notebook **`TRATAMIENTO DE DATOS.ipynb`**.
-    * *Resultado:* Carga los datos, realiza la limpieza, ingeniería de features y guarda los resultados en la Capa Silver/Gold.
+    * Abrir y ejecutar completamente el notebook **`TRATAMIENTO DE DATOS.ipynb`**.
+    * *Resultado:* Carga los datos, realiza la limpieza, ingeniería de features y guarda los resultados en la Capa Silver/Gold.
 
 3.  **Paso 2: MODELOS PREDICTIVOS**
-    * Abrir y ejecutar completamente el notebook **`MODELOS PREDICTIVOS.ipynb`**.
-    * *Resultado:* Utiliza los datos procesados para entrenar y evaluar los modelos (Clustering y Churn Score).
+    * Abrir y ejecutar completamente el notebook **`MODELOS PREDICTIVOS.ipynb`**.
+    * *Resultado:* Utiliza los datos procesados para entrenar y evaluar los modelos (Clustering y Churn Score).
 
 ---
 
