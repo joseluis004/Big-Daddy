@@ -1,12 +1,5 @@
 # 🚀 FinPlus Analytics Challenge: De Datos a Decisiones Accionables (Big-Daddy)
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Tecnología-PySpark%2FDocker-blue" alt="PySpark Badge"/>
-  <img src="https://img.shields.io/badge/Metodología-Layered%20Architecture-informational" alt="Layered Architecture Badge"/>
-  <img src="https://img.shields.io/badge/Análisis-Churn%20Score%20%2F%20RFMI-success" alt="Analysis Badge"/>
-  <img src="https://img.shields.io/badge/Status-Completado-brightgreen" alt="Status Badge"/>
-</p>
-
 ---
 
 ## 1. 💡 Resumen y Objetivo Estratégico
@@ -148,7 +141,7 @@ El proceso de ETL, Feature Engineering y Modelado se realiza mediante la ejecuci
 | **Documentación** | Propuesta Inicial, Fundamentos y Diagrama de Arquitectura. | `docs/` |
 | **Código Fuente** | Repositorio completo (commits y PRs). | [GitHub: Big-Daddy](https://github.com/joseluis004/Big-Daddy) |
 | **Código ETL** | Limpieza y Feature Engineering con PySpark. | `notebooks/TRATAMIENTO DE DATOS.ipynb` |
-| **Código Modelado** | Clustering, Churn Score. | `notebooks/MODELOS PREDICTIVOS.ipynb` |
+| **Código Modelado** | Xgboost, Red neuronal, Churn Score. | `notebooks/MODELOS PREDICTIVOS.ipynb` |
 | **Visualización/Servicio** | Aplicación o Dashboard Ejecutivo (Implementado en Tableau). | `portal_app/` y [**LINK AL DASHBOARD** (Tableau/PowerBI)] |
 
 **¡Gracias por su tiempo! Esperamos convertirnos en su socio analítico 2025.**
