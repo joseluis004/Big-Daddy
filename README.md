@@ -129,7 +129,7 @@ El proceso de ETL, Feature Engineering y Modelado se realiza mediante la ejecuci
 1.  En la interfaz de JupyterLab, navegue a la carpeta **`notebooks/`**.
 2.  **Paso 1: TRATAMIENTO DE DATOS**
     * Abrir y ejecutar completamente el notebook **`TRATAMIENTO DE DATOS.ipynb`**.
-    * *Resultado:* Carga los datos, realiza la limpieza, ingeniería de features y guarda los resultados en la Capa Silver/Gold.
+    * *Resultado:* Carga los datos, realiza la limpieza, ingeniería de features y genera múltiples archivos Parquet de resultados. El modelo posterior ejecutará automáticamente el archivo **`Master_Model_FinPlus.parquet`** que se encuentra en `data/curated/`.
 3.  **Paso 2: MODELOS PREDICTIVOS**
     * Abrir y ejecutar completamente el notebook **`MODELOS PREDICTIVOS.ipynb`**.
     * *Resultado:* Utiliza los datos procesados para entrenar y evaluar los modelos (Clustering y Churn Score). **Importante:** Se entrenaron y evaluaron dos modelos para la predicción de churn: **XGBoost** y una **Red Neuronal**. Dado que el modelo XGBoost demostró un mejor desempeño en términos de precisión y robustez, fue seleccionado como el modelo final para la implementación en producción. Sin embargo, ambos modelos están disponibles en el repositorio para fines de transparencia y reproducibilidad.
