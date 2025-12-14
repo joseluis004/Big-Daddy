@@ -37,26 +37,26 @@ def load_xgboost_model():
         # Intentar cargar primero el modelo joblib
         if os.path.exists(joblib_path):
             model = joblib.load(joblib_path)
-            st.success("Modelo XGBoost (joblib) cargado correctamente")
+            st.success("Modelo XGBoost cargado correctamente")
             return model
         # Si no existe joblib, intentar cargar h5
         elif os.path.exists(h5_path):
-            st.info("ℹ Modelo .h5 encontrado - Nota: Se necesita implementar carga específica para .h5")
+            st.info("ℹ Modelo .h5 encontrado")
             # Para cargar modelo .h5 necesitarías: from tensorflow.keras.models import load_model
             # model = load_model(h5_path)
             return None
         else:
-            st.warning("⚠️ Archivos del modelo no encontrados en 'models/'. Usando modelo simulado.")
+            st.warning("Archivos del modelo no encontrados en 'models/'. Usando modelo simulado.")
             return None
     except Exception as e:
-        st.error(f"❌ Error al cargar el modelo: {str(e)}")
+        st.error(f"Error al cargar el modelo: {str(e)}")
         return None
 
 # Cargar el modelo al inicio
 xgboost_model = load_xgboost_model()
 
 # ==========================================
-# CSS PERSONALIZADO (ACTUALIZADO MÁS AGRESIVAMENTE)
+# CSS PERSONALIZADO
 # ==========================================
 st.markdown("""
 <style>
@@ -65,7 +65,7 @@ st.markdown("""
     footer {visibility: hidden;}
     header {visibility: hidden;}
     
-    /* Eliminar márgenes y paddings para fondo completo - MÁS AGRESIVO */
+    /* Eliminar márgenes y paddings para fondo completo */
     .block-container {
         padding-top: 0rem !important;
         padding-bottom: 0rem !important;
@@ -75,7 +75,7 @@ st.markdown("""
         margin-top: -70px !important;
     }
     
-    /* Fondo del dashboard - MODIFICADO: -70px en lugar de -80px */
+    /* Fondo del dashboard: */
     .stApp {
         margin-top: -70px !important;
         background: #0f172a !important;
@@ -84,7 +84,7 @@ st.markdown("""
         margin: 0 !important;
     }
     
-    /* Contenedor principal del dashboard - AJUSTADO */
+    /* Contenedor principal del dashboard */
     .main-content {
         background: #0f172a;
         padding: 0rem 1.5rem;
@@ -93,7 +93,7 @@ st.markdown("""
         margin-top: 0px !important;
     }
     
-    /* Título principal de Riesgo - REDUCIDO padding-top */
+    /* Título principal de Riesgo */
     .risk-title {
         font-size: 32px !important;
         font-weight: 800 !important;
@@ -104,7 +104,7 @@ st.markdown("""
         padding-top: 0.5rem !important;
     }
     
-    /* Subtítulo de Riesgo - MÁS GRANDE */
+    /* Subtítulo de Riesgo */
     .risk-subtitle {
         color: #94a3b8 !important;
         font-size: 14px !important;
@@ -114,7 +114,7 @@ st.markdown("""
         text-transform: uppercase !important;
     }
     
-    /* Tarjetas de métricas - MÁS GRANDES CON MÁRGENES */
+    /* Tarjetas de métricas */
     .metric-card-risk {
         background: linear-gradient(135deg, #0b1228 0%, #101f3d 100%) !important;
         border-radius: 16px !important;
@@ -131,7 +131,7 @@ st.markdown("""
         box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5) !important;
     }
     
-    /* Títulos de secciones - MÁS GRANDES Y ESPACIADOS */
+    /* Títulos de secciones */
     .section-title {
         font-size: 22px !important;
         font-weight: 700 !important;
@@ -198,7 +198,7 @@ st.markdown("""
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
     
-    /* Upload box más grande y CENTRADO - ESTILO SIMPLIFICADO */
+    /* Upload box más grande */
     .upload-box {
         background-color: #1e293b !important;
         border: 2px dashed #00ffff !important;
@@ -220,7 +220,7 @@ st.markdown("""
         box-shadow: 0 0 25px rgba(0, 255, 255, 0.3) !important;
     }
     
-    /* Título intuitivo para cargar CSV */
+    /* Título para cargar CSV */
     .upload-title {
         font-size: 20px !important;
         font-weight: 600 !important;
@@ -242,12 +242,12 @@ st.markdown("""
         left: 0 !important;
     }
     
-    /* TRUCO DEL BOTÓN FANTASMA */
+    /* TRUCO DEL BOTON FANTASMA */
     .ghost-button-container {
         display: none !important;
     }
     
-    /* Footer mejor espaciado */
+    /* pie de página */
     .dashboard-footer {
         text-align: center !important;
         margin-top: 4rem !important;
@@ -257,7 +257,7 @@ st.markdown("""
         border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
     
-    /* Ajustes responsive para pantallas grandes */
+    /* Ajustes para pantallas grandes */
     @media (min-width: 1200px) {
         .main-content {
             padding: 0rem 3rem !important;
@@ -638,7 +638,7 @@ document.body.style.overflow = 'hidden';
 """
 
 # ==========================================
-# LÓGICA DE DATOS (ACTUALIZADA CON TODAS LAS CARACTERÍSTICAS)
+# LÓGICA DE DATOS
 # ==========================================
 
 # Lista completa de características que espera el modelo XGBoost
@@ -725,8 +725,8 @@ def simulate_risk_data():
         probs = np.clip(probs + np.random.normal(0, 0.1, len(df)), 0.01, 0.99)
         preds = (probs >= 0.5).astype(int)
     
-    # Crear DataFrame de importancia de características (simulado)
-    importances = np.random.rand(len(XGBOOST_FEATURES[:10]))  # Solo mostrar top 10
+    # Crear DataFrame de importancia de características
+    importances = np.random.rand(len(XGBOOST_FEATURES[:10]))
     importances = importances / importances.sum()
     df_importance = pd.DataFrame({
         'Feature': XGBOOST_FEATURES[:10],
@@ -827,7 +827,7 @@ def process_data_and_predict(df_input: pd.DataFrame):
     return results, scaled_data
 
 # ==========================================
-# FUNCIÓN DEL DASHBOARD (MODIFICADA)
+# FUNCIÓN DEL DASHBOARD
 # ==========================================
 
 def create_dashboard():
@@ -835,8 +835,8 @@ def create_dashboard():
     
     st.markdown('<div class="main-content">', unsafe_allow_html=True)
     
-    # Título principal - MÁS GRANDE Y MEJOR ESPACIADO
-    model_status = "✅ Modelo XGBoost" if xgboost_model is not None else "⚠️ Modelo Simulado"
+    # Título principal
+    model_status = " Modelo XGBoost" if xgboost_model is not None else "Modelo Simulado"
     
     st.markdown(f"""
     <div style="text-align: center; padding: 2rem 0 1rem 0;">
@@ -851,9 +851,9 @@ def create_dashboard():
     # Separador elegante
     st.markdown('<hr>', unsafe_allow_html=True)
     
-    # --- SECCIÓN DE CARGA DE DATOS - SIMPLIFICADA (QUITADO EL CUADRADO) ---
+    # --- SECCIÓN DE CARGA DE DATOS ---
     
-    # Título intuitivo para cargar CSV
+    # Título para cargar CSV
     st.markdown("""
     <div class="upload-title">
         CARGAR DATOS DE CLIENTES (CSV)
@@ -871,7 +871,7 @@ def create_dashboard():
     # Inicializar con datos simulados
     results, scaled, df_importance, feature_names = simulate_risk_data()
     
-    # Procesar archivo subido - MANTENIDO IGUAL
+    # Procesar archivo subido
     if uploaded_file is not None:
         try:
             df_uploaded = pd.read_csv(uploaded_file)
@@ -907,7 +907,7 @@ def create_dashboard():
         'hovermode': 'closest'
     }
     
-    # --- Fila 1: Indicadores Clave (Métricas) - MÁS ESPACIADAS ---
+    # --- Fila 1: Indicadores Clave (Métricas) ---
     st.markdown('<div class="section-title">🔑 Métricas Clave del Modelo</div>', unsafe_allow_html=True)
     
     # Usar 2 filas de 2 columnas cada una para mejor distribución en pantallas grandes
@@ -936,7 +936,7 @@ def create_dashboard():
     # Separador
     st.markdown('<hr>', unsafe_allow_html=True)
     
-    # --- Fila 2: Visualizaciones - MEJOR DISTRIBUIDAS ---
+    # --- Fila 2: Visualizaciones ---
     st.markdown('<div class="section-title"> Visualizaciones del Modelo</div>', unsafe_allow_html=True)
     
     # Primera fila de gráficos
@@ -1059,7 +1059,7 @@ def create_dashboard():
     # Separador
     st.markdown('<hr>', unsafe_allow_html=True)
     
-    # --- Fila 3: Tabla y Exportación - MEJOR ORGANIZADO ---
+    # --- Fila 3: Tabla y Exportación ---
     st.markdown('<div class="section-title">Resultados y Exportación</div>', unsafe_allow_html=True)
     
     col_data, col_export = st.columns([3, 1])
@@ -1067,7 +1067,7 @@ def create_dashboard():
     with col_data:
         st.markdown("####Resultados de Predicción")
         if total_count > 0:
-            # Formatear mejor la tabla
+            # Formatear la tabla
             df_display = results[['CLIENT_ID', 'PROBABILIDAD_NON_COMPLIANT', 'Nivel_Riesgo']].copy()
             df_display['PROBABILIDAD_NON_COMPLIANT'] = df_display['PROBABILIDAD_NON_COMPLIANT'].apply(lambda x: f"{x:.2%}")
             df_display = df_display.rename(columns={
@@ -1081,7 +1081,7 @@ def create_dashboard():
                 color = '#ffcccc' if row['Nivel de Riesgo'] == 'ALTO RIESGO' else '#ccffcc'
                 return ['background-color: {}'.format(color)] * len(row)
             
-            # Mostrar tabla con mejor formato
+            # Mostrar tabla
             st.dataframe(
                 df_display.style.apply(highlight_rows, axis=1),
                 use_container_width=True,
@@ -1108,7 +1108,7 @@ def create_dashboard():
                 use_container_width=True
             )
     
-    # Footer del dashboard
+    # Pie de página del dashboard
     st.markdown("""
     <div class="dashboard-footer">
         <div style="font-size: 16px; font-weight: 600; margin-bottom: 0.5rem; color: #00ffff;">
@@ -1137,7 +1137,6 @@ def create_dashboard():
 if 'portal_complete' not in st.session_state:
     st.session_state.portal_complete = False
 
-# Solo mostrar el botón fantasma cuando NO estemos en el dashboard
 if not st.session_state.portal_complete:
     st.markdown('<div class="ghost-button-container">', unsafe_allow_html=True)
     if st.button("ENTRAR_AL_DASHBOARD_TRIGGER", key="btn_trigger_hidden"):
@@ -1145,7 +1144,7 @@ if not st.session_state.portal_complete:
         st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
 
-# Lógica de renderizado
+# Renderizado
 if not st.session_state.portal_complete:
     # Mostrar portal Three.js
     components.html(threejs_portal, height=1000, scrolling=False)
