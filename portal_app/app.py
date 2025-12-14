@@ -1000,11 +1000,11 @@ def create_dashboard():
             if scaled.shape[0] > 1 and scaled.shape[1] >= 2:
                 pca = PCA(min(2, scaled.shape[1]))
                 coords = pca.fit_transform(scaled)
-                results["Dim1"] = coords[:,0]
-                results["Dim2"] = coords[:,1]
+                results["Componente_Principal_1"] = coords[:,0]
+                results["Componente_Principal_2"] = coords[:,1]
                 
                 pca_plot = px.scatter(
-                    results, x="Dim1", y="Dim2", color="Nivel_Riesgo",
+                    results, x="Componente_Principal_1", y="Componente_Principal_2", color="Nivel_Riesgo",
                     size="PROBABILIDAD_NON_COMPLIANT", 
                     color_discrete_map={'ALTO RIESGO':'#ff4b4b', 'BAJO RIESGO':'#004aad'},
                     hover_name="CLIENT_ID", 
