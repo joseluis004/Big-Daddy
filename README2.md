@@ -16,6 +16,7 @@ Nuestro objetivo es transformar los datos crudos de clientes (demográficos, dig
 | **2** | Detectar Riesgos | **Modelo Predictivo de Abandono (Churn Score)** asignado a cada cliente. |
 | **3** | Oportunidades | **Features RFMI** y métricas de propensión para impulsar el *cross-selling*. |
 | **4** | Toma de Decisiones | **Dashboard Ejecutivo (Tableau)** con KPIs claros y narrativos. |
+| **5** | Portal Interactivo | **Aplicación Streamlit** para predicciones en tiempo real. |
 
 ---
 
@@ -73,7 +74,7 @@ El proyecto se desarrolló con un enfoque ágil en 3 semanas:
 | :--- | :--- | :--- | :--- |
 | **Semana 1** | Fundación Técnica y ETL | Crear el entorno Docker, montar el repositorio en GitHub. Ingesta de datos, auditoría, imputación de nulos y ejecución del ETL de limpieza inicial. | Jose Luis, Claudia |
 | **Semana 2** | Modelado y Análisis Avanzado | Calcular los 7 indicadores de comportamiento. Crear variables $Y/T$ y entrenar los modelos predictivos. | Núria, Benjamín, Jose Luis |
-| **Semana 3** | Visualización y Documentación | Construir los 7 Cuadros de Mando en Tableau. Redacción final de la documentación. | Benjamín, Jose Luis, Claudia, Núria |
+| **Semana 3** | Visualización y Documentación | Construir los 7 Cuadros de Mando en Tableau. Desarrollo del portal interactivo Streamlit. Redacción final de la documentación. | Benjamín, Jose Luis, Claudia, Núria |
 
 #### Puntos de Control Clave (Milestones)
 
@@ -82,7 +83,8 @@ El proyecto se desarrolló con un enfoque ágil en 3 semanas:
 | **M1: Entorno Operativo** | Entorno técnico configurado. |
 | **M2: Master View Lista** | Capa Curada creada y validada. |
 | **M3: Inteligencia Analítica** | Todos los 7 indicadores calculados y Modelos Predictivos entrenados. |
-| **M4: Solución Completa** | Documentación y 6 Dashboards de Tableau finalizados. |
+| **M4: Portal Interactivo** | Aplicación Streamlit desplegada y operativa. |
+| **M5: Solución Completa** | Documentación y 6 Dashboards de Tableau finalizados. |
 
 ---
 
@@ -132,6 +134,19 @@ El proceso de ETL, Feature Engineering y Modelado se realiza mediante la ejecuci
     * Abrir y ejecutar completamente el notebook **`MODELOS PREDICTIVOS.ipynb`**.
     * *Resultado:* Utiliza los datos procesados para entrenar y evaluar los modelos (Clustering y Churn Score).
 
+### 4.3. Portal Interactivo FinPlus
+
+Hemos desarrollado un portal interactivo utilizando **Streamlit** que permite cargar nuevos datos en formato CSV y obtener predicciones del modelo XGBoost en tiempo real.
+
+**🔗 Acceso al Portal:**
+- **URL:** [big-daddy-episjsskxsskkkuyuaq7iv.streamlit.app](https://big-daddy-episjsskxsskkkuyuaq7iv.streamlit.app)
+
+**Funcionalidades del Portal:**
+- **Carga de Datos:** Interfaz intuitiva para subir archivos CSV con datos de clientes.
+- **Predicción en Tiempo Real:** El modelo XGBoost entrenado realiza predicciones de churn score inmediatamente.
+- **Visualización de Resultados:** Muestra las probabilidades de abandono para cada cliente.
+- **Descarga de Resultados:** Permite exportar las predicciones para su uso posterior.
+
 ---
 
 ## 5. 🔗 Entregables y Resultados
@@ -142,6 +157,7 @@ El proceso de ETL, Feature Engineering y Modelado se realiza mediante la ejecuci
 | **Código Fuente** | Repositorio completo (commits y PRs). | [GitHub: Big-Daddy](https://github.com/joseluis004/Big-Daddy) |
 | **Código ETL** | Limpieza y Feature Engineering con PySpark. | `notebooks/TRATAMIENTO DE DATOS.ipynb` |
 | **Código Modelado** | Xgboost, Red neuronal, Churn Score. | `notebooks/MODELOS PREDICTIVOS.ipynb` |
+| **Portal Interactivo** | Aplicación Streamlit para predicciones en tiempo real. | [Portal FinPlus](https://big-daddy-episjsskxsskkkuyuaq7iv.streamlit.app) |
 | **Visualización/Servicio** | Aplicación o Dashboard Ejecutivo (Implementado en Tableau). | `portal_app/` y [**LINK AL DASHBOARD** (Tableau/PowerBI)] |
 
 **¡Gracias por su tiempo! Esperamos convertirnos en su socio analítico 2025.**
