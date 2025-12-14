@@ -1065,7 +1065,7 @@ def create_dashboard():
     col_data, col_export = st.columns([3, 1])
     
     with col_data:
-        st.markdown("####Resultados de Predicción")
+        st.markdown("Resultados de Predicción")
         if total_count > 0:
             # Formatear la tabla
             df_display = results[['CLIENT_ID', 'PROBABILIDAD_NON_COMPLIANT', 'Nivel_Riesgo']].copy()
