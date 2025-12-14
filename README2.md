@@ -1,10 +1,10 @@
 # 🚀 FinPlus Analytics Challenge: De Datos a Decisiones Accionables (Big-Daddy)
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Tecnología-PySpark%2FDocker-blue" alt="PySpark Badge"/>
-  <img src="https://img.shields.io/badge/Metodología-Layered%20Architecture-informational" alt="Layered Architecture Badge"/>
-  <img src="https://img.shields.io/badge/Análisis-Churn%20Score%20%2F%20RFMI-success" alt="Analysis Badge"/>
-  <img src="https://img.shields.io/badge/Status-Completado-brightgreen" alt="Status Badge"/>
+  <img src="https://img.shields.io/badge/Tecnología-PySpark%2FDocker-blue" alt="PySpark Badge"/>
+  <img src="https://img.shields.io/badge/Metodología-Layered%20Architecture-informational" alt="Layered Architecture Badge"/>
+  <img src="https://img.shields.io/badge/Análisis-Churn%20Score%20%2F%20RFMI-success" alt="Analysis Badge"/>
+  <img src="https://img.shields.io/badge/Status-Completado-brightgreen" alt="Status Badge"/>
 </p>
 
 ---
@@ -32,14 +32,11 @@ El diseño del proyecto utiliza un modelo de **Arquitectura por Capas (Layered A
 
 ### 2.1. Arquitectura de Datos y Motor
 
-
-
 [Image of Layered Data Architecture]
-
 
 * **Paradigma:** Arquitectura por Capas, enfoque en Batch Processing.
 * **Motor Principal:** **Apache Spark / PySpark**. Es esencial para manejar el Volumen y la Variedad de los datos transaccionales.
-* **Almacenamiento Final:** **Master\_FINAL\_CONSOLIDADO.parquet** en formato **Parquet**. Este formato columnar optimiza la compresión y la velocidad de consulta en la capa de BI y Machine Learning.
+* **Almacenamiento Final:** **Master_FINAL_CONSOLIDADO.parquet** en formato **Parquet**. Este formato columnar optimiza la compresión y la velocidad de consulta en la capa de BI y Machine Learning.
 
 ### 2.2. Flujo ETL (Extracción, Transformación, Carga)
 
@@ -49,12 +46,12 @@ El flujo modular se implementa en PySpark dentro de la *Curated Layer*.
 Se ingesta la información demográfica/contractual (`CLIENTS.csv`) y el comportamiento transaccional (`BEHAVIOURAL.parquet`) usando DataFrames distribuidos de PySpark.
 
 #### B. Transformación (T)
-1.  **Limpieza y Normalización:**
-    * **Imputación Estratégica:** Se rellenan variables de *scoring* o antigüedad (CAR AGE, JOB\_SENIORITY) con **-1** (valor sentinel).
+1.  **Limpieza y Normalización:**
+    * **Imputación Estratégica:** Se rellenan variables de *scoring* o antigüedad (CAR AGE, JOB_SENIORITY) con **-1** (valor sentinel).
     * Las variables de historial de préstamo se rellenan con **0** (asumiendo "Sin Historial").
     * Las variables categóricas (ej., EDUCATION) se rellenan con **'UNKNOWN'**.
     * **Normalización:** Las 10 variables categóricas se convierten a valores numéricos discretos mediante **Label Encoding (StringIndexer)**.
-2.  **Feature Engineering:** Creación de las 7 dimensiones de valor del cliente:
+2.  **Feature Engineering:** Creación de las 7 dimensiones de valor del cliente:
     * **Métricas RFMI:** Recencia (`DAYS SINCE LAST_TXN`), Frecuencia (`FREQUENCY_COUNT`), e Intensidad (`INTENSITY_AVG_SPEND`).
     * **Riesgo Operativo:** Cálculo del `PAYMENT FIDELITY RATIO`.
     * **Targets ML:** Creación de variables binarias `Y` (`Y_RISK_CHURN`) y `T` (`TREATMENT_GROUP`) para modelado Causal (Uplift).
@@ -108,39 +105,37 @@ Utilizamos **GitHub** para el control de versiones, asegurando que el código se
 
 ### 4.1. Puesta en Marcha del Entorno
 
-1.  **Clonar el Repositorio:**
-    ```bash
-    git clone [https://github.com/joseluis004/Big-Daddy.git](https://github.com/joseluis004/Big-Daddy.git)
-    cd Big-Daddy/
-    ```
+1.  **Clonar el Repositorio:**
+    ```bash
+    git clone https://github.com/joseluis004/Big-Daddy.git
+    cd Big-Daddy/
+    ```
 
-2.  **Navegar a la Carpeta de Configuración Docker:**
-    ```bash
-    cd docker_big_daddy/
-    ```
+2.  **Navegar a la Carpeta de Configuración Docker:**
+    ```bash
+    cd docker_big_daddy/
+    ```
 
-3.  **Construir el Entorno (Instala PySpark, Python, librerías):**
-    ```bash
-    docker-compose build
-    ```
+3.  **Construir el Entorno (Instala PySpark, Python, librerías):**
+    ```bash
+    docker-compose build
+    ```
 
-4.  **Ejecutar el Contenedor (Inicia JupyterLab):**
-    ```bash
-    docker-compose up
-    ```
-    *Una vez iniciado, acceda al enlace `http://localhost:8888` (o el que se muestre en la terminal) en su navegador para entrar a JupyterLab.*
+4.  **Ejecutar el Contenedor (Inicia JupyterLab):**
+    ```bash
+    docker-compose up
+    ```
+    *Una vez iniciado, acceda al enlace `http://localhost:8888` (o el que se muestre en la terminal) en su navegador para entrar a JupyterLab.*
 
 ### 4.2. Ejecución del Pipeline Analítico
 
 El proceso de ETL, Feature Engineering y Modelado se realiza mediante la ejecución secuencial de los Notebooks dentro del contenedor de JupyterLab.
 
-1.  En la interfaz de JupyterLab, navegue a la carpeta **`notebooks/`**.
-
-2.  **Paso 1: TRATAMIENTO DE DATOS**
+1.  En la interfaz de JupyterLab, navegue a la carpeta **`notebooks/`**.
+2.  **Paso 1: TRATAMIENTO DE DATOS**
     * Abrir y ejecutar completamente el notebook **`TRATAMIENTO DE DATOS.ipynb`**.
     * *Resultado:* Carga los datos, realiza la limpieza, ingeniería de features y guarda los resultados en la Capa Silver/Gold.
-
-3.  **Paso 2: MODELOS PREDICTIVOS**
+3.  **Paso 2: MODELOS PREDICTIVOS**
     * Abrir y ejecutar completamente el notebook **`MODELOS PREDICTIVOS.ipynb`**.
     * *Resultado:* Utiliza los datos procesados para entrenar y evaluar los modelos (Clustering y Churn Score).
 
