@@ -132,7 +132,7 @@ El proceso de ETL, Feature Engineering y Modelado se realiza mediante la ejecuci
     * *Resultado:* Carga los datos, realiza la limpieza, ingeniería de features y guarda los resultados en la Capa Silver/Gold.
 3.  **Paso 2: MODELOS PREDICTIVOS**
     * Abrir y ejecutar completamente el notebook **`MODELOS PREDICTIVOS.ipynb`**.
-    * *Resultado:* Utiliza los datos procesados para entrenar y evaluar los modelos (Clustering y Churn Score).
+    * *Resultado:* Utiliza los datos procesados para entrenar y evaluar los modelos (Clustering y Churn Score). **Importante:** Se entrenaron y evaluaron dos modelos para la predicción de churn: **XGBoost** y una **Red Neuronal**. Dado que el modelo XGBoost demostró un mejor desempeño en términos de precisión y robustez, fue seleccionado como el modelo final para la implementación en producción. Sin embargo, ambos modelos están disponibles en el repositorio para fines de transparencia y reproducibilidad.
 
 ### 4.3. Portal Interactivo FinPlus
 
