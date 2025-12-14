@@ -718,7 +718,7 @@ def simulate_risk_data():
             # Simulación simple basada en características principales
             probs = 0.1 + (df['TOTAL_INCOME'] < 30000) * 0.3 + (df['AMOUNT_PRODUCT'] > 20000) * 0.3
             probs = np.clip(probs + np.random.normal(0, 0.1, len(df)), 0.01, 0.99)
-            preds = (probs >= 0.5).ast(int)
+            preds = (probs >= 0.5).astype(int)
     else:
         # Simulación simple
         probs = 0.1 + (df['TOTAL_INCOME'] < 30000) * 0.3 + (df['AMOUNT_PRODUCT'] > 20000) * 0.3
@@ -1076,12 +1076,10 @@ def create_dashboard():
                 'Nivel_Riesgo': 'Nivel de Riesgo'
             }).head(15)  # Mostrar más filas en pantallas grandes
             
-            # Función para colorear las filas CON TEXTO EN NEGRO
+            # Función para colorear las filas
             def highlight_rows(row):
                 color = '#ffcccc' if row['Nivel de Riesgo'] == 'ALTO RIESGO' else '#ccffcc'
-                return [
-                    f'background-color: {background_color}; color: black; font-weight: 500'
-                ] * len(row)
+                return ['background-color: {}'.format(color)] * len(row)
             
             # Mostrar tabla
             st.dataframe(
