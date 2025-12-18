@@ -132,7 +132,7 @@ El proceso de ETL, Feature Engineering y Modelado se realiza mediante la ejecuci
     * *Resultado:* Carga los datos, realiza la limpieza, ingeniería de features y genera múltiples archivos Parquet de resultados. Los modelos predictivos posteriormente ejecutarán el archivo **`Master_Model_FinPlus.parquet`** que se encuentra en `data/curated/`.
 3.  **Paso 2: MODELOS PREDICTIVOS**
     * Abrir y ejecutar completamente el notebook **`MODELOS PREDICTIVOS.ipynb`**.
-    * *Resultado:* Utiliza los datos procesados para entrenar y evaluar los modelos (Churn Score). **Importante:** Se entrenaron y evaluaron dos modelos para la predicción de churn: **XGBoost** y una **Red Neuronal**. Dado que el modelo XGBoost demostró un mejor desempeño en términos de precisión, fue seleccionado como el modelo final para la implementación en producción. Sin embargo, ambos modelos están disponibles en el repositorio.
+    * *Resultado:* Utiliza los datos procesados para entrenar y evaluar los modelos. **Importante:** Se entrenaron y evaluaron dos modelos para la predicción de churn: **XGBoost** y una **Red Neuronal**. Dado que el modelo XGBoost demostró un mejor desempeño en términos de precisión, fue seleccionado como el modelo final para la implementación en producción. Sin embargo, ambos modelos están disponibles en el repositorio.
 ### 4.3. Portal Interactivo FinPlus
 
 Hemos desarrollado un portal interactivo utilizando **Streamlit** que permite cargar nuevos datos en formato CSV y obtener predicciones del modelo XGBoost en tiempo real.
@@ -155,7 +155,7 @@ Hemos desarrollado un portal interactivo utilizando **Streamlit** que permite ca
 | **Documentación** | Propuesta Inicial, Fundamentos y Diagrama de Arquitectura. | `docs/` |
 | **Código Fuente** | Repositorio completo (commits y PRs). | [GitHub: Big-Daddy](https://github.com/joseluis004/Big-Daddy) |
 | **Código ETL** | Limpieza y Feature Engineering con PySpark. | `notebooks/TRATAMIENTO DE DATOS.ipynb` |
-| **Código Modelado** | Xgboost, Red neuronal, Churn Score. | `notebooks/MODELOS PREDICTIVOS.ipynb` |
+| **Código Modelado** | Xgboost, Red neuronal. | `notebooks/MODELOS PREDICTIVOS.ipynb` |
 | **Portal Interactivo** | Aplicación Streamlit para predicciones en tiempo real. | [Portal FinPlus](https://big-daddy-episjsskxsskkkuyuaq7iv.streamlit.app) |
 | **Visualización/Servicio** | 6 Dashboards Ejecutivos implementados en Tableau Public. | [Dashboard 1: Anomaly Class](https://public.tableau.com/app/profile/jose.luis.perez3391/viz/Big_Daddy_dashboards_1/DashboardANOMALYCLASS)<br>[Dashboard 2: Riesgo Abandono](https://public.tableau.com/app/profile/jose.luis.perez3391/viz/Big_Daddy_dashboards_2/DashboardRIESGOABANDONO)<br>[Dashboard 3: Barras de Actividad](https://public.tableau.com/app/profile/jose.luis.perez3391/viz/Big_Daddy_dashboards_3/DashboardBARRASDEACTIVIDAD)<br>[Dashboard 4: Barras Apiladas de Valor](https://public.tableau.com/app/profile/jose.luis.perez3391/viz/Big_Daddy_dashboards_4/DashboardBARRASAPILADASDEVALOR)<br>[Dashboard 5: Barras Agrupadas de Interacción](https://public.tableau.com/app/profile/jose.luis.perez3391/viz/Big_Daddy_dashboards_5/DashboardBARRASAGRUPADASDEINTERACCIN)<br>[Dashboard 6: Dispersión de Riesgo](https://public.tableau.com/app/profile/jose.luis.perez3391/viz/Big_Daddy_dashboards_6/DashboardDISPERSINDERIESGO) |
 
