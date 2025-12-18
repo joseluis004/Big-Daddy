@@ -13,7 +13,7 @@ Nuestro objetivo es transformar los datos crudos de clientes (demográficos, dig
 | # | Objetivo FinPlus | Resultado de la Solución |
 | :-: | :--- | :--- |
 | **1** | Comprender Clientes | **Segmentación Avanzada (Clustering)** para crear perfiles 360°. |
-| **2** | Detectar Riesgos | **Modelo Predictivo de Abandono (Churn Score)** asignado a cada cliente. |
+| **2** | Detectar Riesgos | **Modelo Predictivo de Incumplimineto de contratos** asignado a cada cliente. |
 | **3** | Oportunidades | **Features RFMI** y métricas de propensión para impulsar el *cross-selling*. |
 | **4** | Toma de Decisiones | **Dashboard Ejecutivo (Tableau)** con KPIs claros y narrativos. |
 | **5** | Portal Interactivo | **Aplicación Streamlit** para predicciones en tiempo real. |
